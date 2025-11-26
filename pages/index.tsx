@@ -94,11 +94,9 @@ export default function Home() {
   const iconVariants = {
     initial: {
       opacity: 0,
-      scale: 0.5,
     },
     animate: (custom: { rotate: number }) => ({
       opacity: 1,
-      scale: 1,
       rotate: isDesktop ? custom.rotate : 0,
     }),
     hover: {
@@ -107,7 +105,7 @@ export default function Home() {
   };
 
   const iconTransition = {
-    duration: 0.2,
+    duration: 0.3,
     ease: "easeOut",
   };
 
@@ -120,24 +118,26 @@ export default function Home() {
           className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12"
           onHoverStart={() => setIsAvatarHovered(true)}
           onHoverEnd={() => setIsAvatarHovered(false)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0, duration: 0.5 }}
         >
           <motion.p
             className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
             Hi, I'm Charles
           </motion.p>
           <motion.div
             className="w-12 h-12 rounded-full shadow-lg sm:ml-4 relative"
-            initial={{ opacity: 0, scale: 0.5, rotate: 0 }}
+            initial={{ opacity: 0, rotate: 0 }}
             animate={{
               opacity: 1,
-              scale: 1,
               rotate: isAvatarHovered ? 183 : 3,
             }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             onHoverStart={() => setHoveredIcon("avatar")}
             onHoverEnd={() => setHoveredIcon(null)}
           >
@@ -172,12 +172,15 @@ export default function Home() {
             setIsMinesquadHovered(false);
             setIsWhalesNestHovered(false);
           }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
         >
           <motion.p
             className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
             I'm building stuff
           </motion.p>
@@ -186,7 +189,7 @@ export default function Home() {
             className="flex items-center"
             variants={{
               animate: {
-                transition: { staggerChildren: 0.1, delayChildren: 0.4 },
+                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
               },
             }}
             initial="initial"
@@ -291,12 +294,15 @@ export default function Home() {
           className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12 group"
           onHoverStart={() => setIsWorkHovered(true)}
           onHoverEnd={() => setIsWorkHovered(false)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
         >
           <motion.p
             className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
             I headed product & design at
           </motion.p>
@@ -305,7 +311,7 @@ export default function Home() {
             className="flex items-center"
             variants={{
               animate: {
-                transition: { staggerChildren: 0.1, delayChildren: 0.4 },
+                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
               },
             }}
             initial="initial"
@@ -604,12 +610,15 @@ export default function Home() {
           className="flex flex-col items-start gap-4 sm:flex-row sm:items-center group"
           onHoverStart={() => setIsHovered(true)}
           onHoverEnd={() => setIsHovered(false)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
         >
           <motion.p
             className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
             Find me here
           </motion.p>
@@ -618,7 +627,7 @@ export default function Home() {
             className="flex items-center"
             variants={{
               animate: {
-                transition: { staggerChildren: 0.1, delayChildren: 0.4 },
+                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
               },
             }}
             initial="initial"
@@ -707,9 +716,8 @@ export default function Home() {
         {/* Line divider */}
         <motion.div
           className="w-full mt-16 mb-8 ml-0"
-          style={{ transformOrigin: "left" }}
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
         >
           <svg
@@ -755,7 +763,7 @@ export default function Home() {
           style={{ color: "#75777A" }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
+          transition={{ delay: 1.15, duration: 0.5 }}
         >
           You need product or design advising for your company?{" "}
           <button
@@ -783,7 +791,7 @@ export default function Home() {
           style={{ color: "#75777A" }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.5 }}
+          transition={{ delay: 1.3, duration: 0.5 }}
         >
           Just want to chat?{" "}
           <a
