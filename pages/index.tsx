@@ -9,6 +9,7 @@ export default function Home() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [isHovered, setIsHovered] = useState(false);
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+  const [isUncloakHovered, setIsUncloakHovered] = useState(false);
   const [isMinesquadHovered, setIsMinesquadHovered] = useState(false);
   const [isWhalesNestHovered, setIsWhalesNestHovered] = useState(false);
   const [isWorkHovered, setIsWorkHovered] = useState(false);
@@ -162,10 +163,12 @@ export default function Home() {
         <motion.div
           className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12 group"
           onHoverStart={() => {
+            setIsUncloakHovered(true);
             setIsMinesquadHovered(true);
             setIsWhalesNestHovered(true);
           }}
           onHoverEnd={() => {
+            setIsUncloakHovered(false);
             setIsMinesquadHovered(false);
             setIsWhalesNestHovered(false);
           }}
@@ -176,7 +179,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            I build stuff.
+            I'm building stuff
           </motion.p>
 
           <motion.div
@@ -189,6 +192,37 @@ export default function Home() {
             initial="initial"
             animate="animate"
           >
+            <motion.a
+              href="https://uncloak.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out 
+                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
+              custom={{ rotate: 2 }}
+              variants={iconVariants}
+              transition={iconTransition}
+              animate={isUncloakHovered ? "hover" : "animate"}
+              onHoverStart={() => setHoveredIcon("uncloak")}
+              onHoverEnd={() => setHoveredIcon(null)}
+            >
+              <Image
+                src="/uncloak.png"
+                alt="Uncloak"
+                width={48}
+                height={48}
+                className="rounded-xl"
+              />
+              {hoveredIcon === "uncloak" && (
+                <div
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
+                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
+                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
+                >
+                  Uncloak - Design on Code
+                </div>
+              )}
+            </motion.a>
+
             <motion.a
               href="https://www.minesquad.app/"
               target="_blank"
@@ -671,22 +705,40 @@ export default function Home() {
         </motion.div>
 
         {/* Line divider */}
-        <motion.hr
-          className="w-full border-t border-gray-300 dark:border-gray-600 mt-16 mb-8 ml-0"
+        <motion.div
+          className="w-full mt-16 mb-8 ml-0"
+          style={{ transformOrigin: "left" }}
           initial={{ opacity: 0, scaleX: 0 }}
           animate={{ opacity: 1, scaleX: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
-          style={{ transformOrigin: "left" }}
-        />
+        >
+          <svg
+            width="100%"
+            height="2"
+            viewBox="0 0 1000 2"
+            preserveAspectRatio="none"
+            className="block"
+          >
+            <path
+              d="M 0 1 L 1000 1"
+              stroke="#75777A"
+              strokeWidth="1"
+              strokeDasharray="8 16"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </motion.div>
 
         {/* Coaching text */}
         <motion.p
-          className="text-lg text-gray-600 dark:text-gray-300"
+          className="text-lg"
+          style={{ color: "#75777A" }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0, duration: 0.5 }}
         >
-          You need to level up your design career with coaching?{" "}
+          You need coaching to level up your design career?{" "}
           <a
             href="https://adplist.org/mentors/charles-binet"
             target="_blank"
@@ -699,12 +751,13 @@ export default function Home() {
 
         {/* Advising text */}
         <motion.p
-          className="text-lg text-gray-600 dark:text-gray-300 mt-4"
+          className="text-lg mt-4"
+          style={{ color: "#75777A" }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.5 }}
         >
-          Your company needs advising?{" "}
+          You need product or design advising for your company?{" "}
           <button
             onClick={handleEmailClick}
             onMouseEnter={handleEmailHover}
@@ -726,7 +779,8 @@ export default function Home() {
 
         {/* Chat text */}
         <motion.p
-          className="text-lg text-gray-600 dark:text-gray-300 mt-4"
+          className="text-lg mt-4"
+          style={{ color: "#75777A" }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.4, duration: 0.5 }}
