@@ -196,7 +196,7 @@ export default function Home() {
             animate="animate"
           >
             <motion.a
-              href="https://uncloak.app"
+              href="https://uidb.ai"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out 
@@ -205,23 +205,23 @@ export default function Home() {
               variants={iconVariants}
               transition={iconTransition}
               animate={isUncloakHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("uncloak")}
+              onHoverStart={() => setHoveredIcon("uidb")}
               onHoverEnd={() => setHoveredIcon(null)}
             >
               <Image
-                src="/uncloak.png"
-                alt="Uncloak"
+                src="/uidb.png"
+                alt="UIDB"
                 width={48}
                 height={48}
                 className="rounded-xl"
               />
-              {hoveredIcon === "uncloak" && (
+              {hoveredIcon === "uidb" && (
                 <div
                   className="absolute -top-10 left-1/2 transform -translate-x-1/2 
                                bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
                                px-2 py-1 rounded text-sm whitespace-nowrap z-10"
                 >
-                  Uncloak - Design on Code
+                  UIDB - Design on Code
                 </div>
               )}
             </motion.a>
