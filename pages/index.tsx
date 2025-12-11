@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Linkedin, Dribbble, Github } from "lucide-react";
+import { Linkedin, Dribbble } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -686,27 +686,32 @@ export default function Home() {
             </motion.a>
 
             <motion.a
-              href="https://github.com/bibtor"
+              href="https://adplist.org/mentors/charles-binet"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transition-all duration-100 ease-out
                          ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
-              style={{ backgroundColor: "#5C6BC0" }}
               custom={{ rotate: -2 }}
               variants={iconVariants}
               transition={iconTransition}
               animate={isHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("github")}
+              onHoverStart={() => setHoveredIcon("adplist")}
               onHoverEnd={() => setHoveredIcon(null)}
             >
-              <Github className="w-6 h-6 text-white" />
-              {hoveredIcon === "github" && (
+              <Image
+                src="/adpList.png"
+                alt="ADPlist"
+                width={48}
+                height={48}
+                className="rounded-xl"
+              />
+              {hoveredIcon === "adplist" && (
                 <div
                   className="absolute -top-10 left-1/2 transform -translate-x-1/2 
                                bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
                                px-2 py-1 rounded text-sm whitespace-nowrap z-10"
                 >
-                  @bibtor
+                  @charles-binet
                 </div>
               )}
             </motion.a>
