@@ -11,6 +11,7 @@ export default function Home() {
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
   const [isUncloakHovered, setIsUncloakHovered] = useState(false);
   const [isMinesquadHovered, setIsMinesquadHovered] = useState(false);
+  const [isDatasweepHovered, setIsDatasweepHovered] = useState(false);
   const [isWhalesNestHovered, setIsWhalesNestHovered] = useState(false);
   const [isWorkHovered, setIsWorkHovered] = useState(false);
 
@@ -164,11 +165,13 @@ export default function Home() {
           className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12 group"
           onHoverStart={() => {
             setIsUncloakHovered(true);
+            setIsDatasweepHovered(true);
             setIsMinesquadHovered(true);
             setIsWhalesNestHovered(true);
           }}
           onHoverEnd={() => {
             setIsUncloakHovered(false);
+            setIsDatasweepHovered(false);
             setIsMinesquadHovered(false);
             setIsWhalesNestHovered(false);
           }}
@@ -222,6 +225,37 @@ export default function Home() {
                                px-2 py-1 rounded text-sm whitespace-nowrap z-10"
                 >
                   UIDB - Design on Code
+                </div>
+              )}
+            </motion.a>
+
+            <motion.a
+              href="https://datasweeper.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
+                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
+              custom={{ rotate: -2 }}
+              variants={iconVariants}
+              transition={iconTransition}
+              animate={isDatasweepHovered ? "hover" : "animate"}
+              onHoverStart={() => setHoveredIcon("datasweep")}
+              onHoverEnd={() => setHoveredIcon(null)}
+            >
+              <Image
+                src="/datasweeper.png"
+                alt="Datasweeper"
+                width={48}
+                height={48}
+                className="rounded-xl"
+              />
+              {hoveredIcon === "datasweep" && (
+                <div
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
+                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
+                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
+                >
+                  Datasweeper - Clean your Mac tool
                 </div>
               )}
             </motion.a>
