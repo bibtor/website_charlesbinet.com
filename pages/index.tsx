@@ -4,6 +4,7 @@ import { Linkedin, Dribbble } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -743,13 +744,30 @@ export default function Home() {
           </svg>
         </motion.div>
 
-        {/* Coaching text */}
+        {/* Portfolio text */}
         <motion.p
           className="text-lg"
           style={{ color: "#75777A" }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0, duration: 0.5 }}
+        >
+          You want to check out my work?{" "}
+          <Link
+            href="/portfolio"
+            className="text-black dark:text-white hover:underline transition-all duration-200"
+          >
+            Portfolio here
+          </Link>
+        </motion.p>
+
+        {/* Coaching text */}
+        <motion.p
+          className="text-lg mt-4"
+          style={{ color: "#75777A" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.15, duration: 0.5 }}
         >
           You need coaching to level up your design career?{" "}
           <a
@@ -762,35 +780,7 @@ export default function Home() {
           </a>
         </motion.p>
 
-        {/* Advising text */}
-        <motion.p
-          className="text-lg mt-4"
-          style={{ color: "#75777A" }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.15, duration: 0.5 }}
-        >
-          You need product or design advising for your company?{" "}
-          <button
-            onClick={handleEmailClick}
-            onMouseEnter={handleEmailHover}
-            onMouseLeave={handleEmailLeave}
-            className="text-black dark:text-white hover:underline transition-all duration-200 cursor-pointer bg-transparent border-none p-0 relative"
-          >
-            {isEmailRevealed ? "charlesbinet@proton.me" : "Click here"}
-            {isEmailCopied && (
-              <div
-                className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                             bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                             px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-              >
-                Copied to clipboard!
-              </div>
-            )}
-          </button>
-        </motion.p>
-
-        {/* Chat text */}
+        {/* Advising / chat text */}
         <motion.p
           className="text-lg mt-4"
           style={{ color: "#75777A" }}
@@ -798,7 +788,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.3, duration: 0.5 }}
         >
-          Just want to chat?{" "}
+          You need product or design advising, or just want to chat?{" "}
           <a
             href="https://x.com/CharlesTenib"
             target="_blank"

@@ -11,3 +11,13 @@
 body {
   @apply bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-white font-sans;
 }
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
