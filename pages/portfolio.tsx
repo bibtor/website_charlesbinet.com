@@ -4,15 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "@/components/ThemeContext";
 import { AboutSection } from "@/components/cases/AboutSection";
-import { CaseStudyPlaceholder } from "@/components/cases/CaseStudyPlaceholder";
-import { FeedbackSection } from "@/components/cases/FeedbackSection";
 import { WorkSection } from "@/components/cases/WorkSection";
 import { Home, Sun, Moon } from "lucide-react";
 
 const sections = [
-  { slug: "about", label: "About" },
   { slug: "work", label: "Work" },
-  { slug: "feedback", label: "Feedback" },
+  { slug: "about", label: "About" },
 ] as const;
 
 type SectionSlug = (typeof sections)[number]["slug"];
@@ -140,19 +137,10 @@ export default function Portfolio() {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <AnimatePresence mode="wait">
-            {activeTab === "about" ? (
-              <AboutSection key="about" />
-            ) : activeTab === "work" ? (
+            {activeTab === "work" ? (
               <WorkSection key="work" />
-            ) : activeTab === "feedback" ? (
-              <FeedbackSection key="feedback" />
             ) : (
-              <CaseStudyPlaceholder
-                key={activeTab}
-                title={
-                  sections.find((s) => s.slug === activeTab)?.label ?? "Section"
-                }
-              />
+              <AboutSection key="about" />
             )}
           </AnimatePresence>
         </motion.div>
