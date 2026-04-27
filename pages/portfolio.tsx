@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "@/components/ThemeContext";
 import { AboutSection } from "@/components/cases/AboutSection";
+import { CreationSection } from "@/components/cases/CreationSection";
 import { WorkSection } from "@/components/cases/WorkSection";
 import { Home, Sun, Moon } from "lucide-react";
 
 const sections = [
   { slug: "work", label: "Work" },
+  { slug: "creation", label: "Creation" },
   { slug: "about", label: "About" },
 ] as const;
 
@@ -139,6 +141,8 @@ export default function Portfolio() {
           <AnimatePresence mode="wait">
             {activeTab === "work" ? (
               <WorkSection key="work" />
+            ) : activeTab === "creation" ? (
+              <CreationSection key="creation" />
             ) : (
               <AboutSection key="about" />
             )}
