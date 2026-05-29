@@ -13,6 +13,7 @@ export default function Home() {
   const [isMinesquadHovered, setIsMinesquadHovered] = useState(false);
   const [isDatasweepHovered, setIsDatasweepHovered] = useState(false);
   const [isWhalesNestHovered, setIsWhalesNestHovered] = useState(false);
+  const [isPictokitHovered, setIsPictokitHovered] = useState(false);
   const [isWorkHovered, setIsWorkHovered] = useState(false);
 
   // Tooltip states for individual icons
@@ -167,11 +168,13 @@ export default function Home() {
             setIsDatasweepHovered(true);
             setIsMinesquadHovered(true);
             setIsWhalesNestHovered(true);
+            setIsPictokitHovered(true);
           }}
           onHoverEnd={() => {
             setIsDatasweepHovered(false);
             setIsMinesquadHovered(false);
             setIsWhalesNestHovered(false);
+            setIsPictokitHovered(false);
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -280,11 +283,42 @@ export default function Home() {
               />
               {hoveredIcon === "whalesnest" && (
                 <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
                                bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
                                px-2 py-1 rounded text-sm whitespace-nowrap z-10"
                 >
                   Whale's Nest - Investor tracking
+                </div>
+              )}
+            </motion.a>
+
+            <motion.a
+              href="https://pictokit.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
+                         ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
+              custom={{ rotate: -2 }}
+              variants={iconVariants}
+              transition={iconTransition}
+              animate={isPictokitHovered ? "hover" : "animate"}
+              onHoverStart={() => setHoveredIcon("pictokit")}
+              onHoverEnd={() => setHoveredIcon(null)}
+            >
+              <Image
+                src="/pictokit.png"
+                alt="PictoKit"
+                width={48}
+                height={48}
+                className="rounded-xl"
+              />
+              {hoveredIcon === "pictokit" && (
+                <div
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
+                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
+                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
+                >
+                  PictoKit - Your shortcut to icons & images
                 </div>
               )}
             </motion.a>
