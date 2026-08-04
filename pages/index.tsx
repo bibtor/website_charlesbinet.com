@@ -117,7 +117,7 @@ export default function Home() {
 
       <div className="max-w-[640px] mx-auto p-8 min-h-screen flex flex-col justify-center">
         <motion.div
-          className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12"
+          className="flex flex-col-reverse items-start gap-4 sm:flex-row sm:items-start mb-4"
           onHoverStart={() => setIsAvatarHovered(true)}
           onHoverEnd={() => setIsAvatarHovered(false)}
           initial={{ opacity: 0, y: 10 }}
@@ -125,15 +125,21 @@ export default function Home() {
           transition={{ delay: 0, duration: 0.5 }}
         >
           <motion.p
-            className="text-lg text-gray-600 dark:text-gray-300"
+            className="text-lg font-bold text-gray-900 dark:text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            Hi, I'm Charles. I design and build software
+            Hi, I'm Charles, software designer fixing
+            <br />
+            early SaaS companies chaos.
+            <br />
+            I turn complex, messy products into
+            <br />
+            clear, scalable, and high-converting software.
           </motion.p>
           <motion.div
-            className="w-12 h-12 rounded-full shadow-lg sm:ml-4 relative"
+            className="w-12 h-12 rounded-full shadow-lg sm:ml-4 relative flex-shrink-0 flex items-center justify-center"
             initial={{ opacity: 0, rotate: 0 }}
             animate={{
               opacity: 1,
@@ -148,7 +154,7 @@ export default function Home() {
               alt="Charles Binet's avatar"
               width={48}
               height={48}
-              className="rounded-full"
+              className="rounded-full block"
             />
             {hoveredIcon === "avatar" && (
               <div
@@ -159,6 +165,173 @@ export default function Home() {
                 Heyyy!
               </div>
             )}
+          </motion.div>
+        </motion.div>
+
+        {/* Intro / positioning text */}
+        <motion.div
+          className="text-lg mb-4"
+          style={{ color: "#75777A" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          <p>
+            I audit your product, build your foundational design system, scope
+            and execute on your product flows and website, async. Let's chat!
+          </p>
+        </motion.div>
+
+        {/* Chat links */}
+        <motion.div
+          className="text-lg mb-8 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-6"
+          style={{ color: "#75777A" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.5 }}
+        >
+          <a
+            href="https://cal.com/charlesbinet/15min?overlayCalendar=true"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-black dark:text-white whitespace-nowrap hover:opacity-70 transition-all duration-200"
+          >
+            Book time on Cal
+          </a>
+          <a
+            href="https://www.linkedin.com/in/charles-binet/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-black dark:text-white whitespace-nowrap hover:opacity-70 transition-all duration-200"
+          >
+            Contact on LinkedIn
+          </a>
+          <a
+            href="https://wa.me/46739047595?text=Hi%20Charles%2C%20I%20saw%20your%20website%20and%20I%27d%20love%20to%20chat%21"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-black dark:text-white whitespace-nowrap hover:opacity-70 transition-all duration-200"
+          >
+            DM on Whatsapp
+          </a>
+        </motion.div>
+
+        {/* Line divider */}
+        <motion.div
+          className="w-full mb-8 ml-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          <svg
+            width="100%"
+            height="2"
+            viewBox="0 0 1000 2"
+            preserveAspectRatio="none"
+            className="block"
+          >
+            <path
+              d="M 0 1 L 1000 1"
+              stroke="#75777A"
+              strokeWidth="1"
+              strokeDasharray="8 16"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </motion.div>
+
+        {/* Worked with row */}
+        <motion.div
+          className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12 group"
+          onHoverStart={() => setIsWorkHovered(true)}
+          onHoverEnd={() => setIsWorkHovered(false)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+        >
+          <motion.p
+            className="text-lg text-gray-600 dark:text-gray-300"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            Working now with
+          </motion.p>
+
+          <motion.div
+            className="flex items-center"
+            variants={{
+              animate: {
+                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+              },
+            }}
+            initial="initial"
+            animate="animate"
+          >
+            <motion.a
+              href="https://brickanta.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 rounded-xl shadow-lg bg-white transition-all duration-100 ease-out
+                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
+              custom={{ rotate: -2 }}
+              variants={iconVariants}
+              transition={iconTransition}
+              animate={isWorkHovered ? "hover" : "animate"}
+              onHoverStart={() => setHoveredIcon("brickanta")}
+              onHoverEnd={() => setHoveredIcon(null)}
+            >
+              <Image
+                src="/brickanta.png"
+                alt="Brickanta AI"
+                width={96}
+                height={96}
+                quality={100}
+                className="w-12 h-12 rounded-xl object-contain p-1.5"
+              />
+              {hoveredIcon === "brickanta" && (
+                <div
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
+                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
+                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
+                >
+                  Brickanta AI
+                </div>
+              )}
+            </motion.a>
+
+            <motion.a
+              href="https://www.eiraai.co/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
+                         ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
+              custom={{ rotate: 2 }}
+              variants={iconVariants}
+              transition={iconTransition}
+              animate={isWorkHovered ? "hover" : "animate"}
+              onHoverStart={() => setHoveredIcon("eira")}
+              onHoverEnd={() => setHoveredIcon(null)}
+            >
+              <Image
+                src="/eira.png"
+                alt="Eira AI"
+                width={96}
+                height={96}
+                quality={100}
+                className="w-12 h-12 rounded-xl object-cover"
+              />
+              {hoveredIcon === "eira" && (
+                <div
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
+                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
+                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
+                >
+                  Eira AI
+                </div>
+              )}
+            </motion.a>
           </motion.div>
         </motion.div>
 
