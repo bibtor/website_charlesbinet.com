@@ -65,6 +65,10 @@ Always use `style={{ color: "#75777A" }}` for secondary text (inline, not a Tail
 - Must accept `key` prop for `AnimatePresence` transitions
 - Wrap content in `motion.div` with enter/exit animations
 
+### Metadata
+- Every page must render a `<Head>` (from `next/head`) with `<title>`, `description`, and Open Graph tags — link scrapers otherwise concatenate visible CTA text into the preview title
+- OG image: `https://www.charlesbinet.com/avatar.jpeg`; canonical host is `www.charlesbinet.com` (apex 307-redirects)
+
 ### Links
 - Internal: `<Link href="/">` from `next/link`
 - External: `<a>` with `target="_blank" rel="noopener noreferrer"`

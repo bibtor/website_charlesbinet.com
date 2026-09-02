@@ -5,6 +5,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Head from "next/head";
 
 export default function Home() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -113,6 +114,37 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-white transition-colors duration-300">
+      <Head>
+        <title>Charles - Product & Design leader</title>
+        <meta
+          name="description"
+          content="I fix early SaaS companies' chaos — turning complex, messy products into clear, scalable, and high-converting software."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Charles - Product & Design leader" />
+        <meta
+          property="og:description"
+          content="I fix early SaaS companies' chaos — turning complex, messy products into clear, scalable, and high-converting software."
+        />
+        <meta property="og:url" content="https://www.charlesbinet.com" />
+        <meta
+          property="og:image"
+          content="https://www.charlesbinet.com/avatar.jpeg"
+        />
+        <meta name="twitter:card" content="summary" />
+        <meta
+          name="twitter:title"
+          content="Charles - Product & Design leader"
+        />
+        <meta
+          name="twitter:description"
+          content="I fix early SaaS companies' chaos — turning complex, messy products into clear, scalable, and high-converting software."
+        />
+        <meta
+          name="twitter:image"
+          content="https://www.charlesbinet.com/avatar.jpeg"
+        />
+      </Head>
       <ThemeToggle />
 
       <div className="max-w-[640px] mx-auto p-8 min-h-screen flex flex-col justify-center">

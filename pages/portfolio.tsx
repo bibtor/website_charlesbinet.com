@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Head from "next/head";
 import { useTheme } from "@/components/ThemeContext";
 import { AboutSection } from "@/components/cases/AboutSection";
 import { CreationSection } from "@/components/cases/CreationSection";
@@ -46,6 +47,25 @@ export default function Portfolio() {
 
   return (
     <main className="min-h-screen bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-white transition-colors duration-300">
+      <Head>
+        <title>Portfolio — Charles Binet</title>
+        <meta
+          name="description"
+          content="Selected work by Charles Binet — software designer turning complex, messy products into clear, scalable, and high-converting software."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Portfolio — Charles Binet" />
+        <meta
+          property="og:description"
+          content="Selected work by Charles Binet — software designer turning complex, messy products into clear, scalable, and high-converting software."
+        />
+        <meta property="og:url" content="https://www.charlesbinet.com/portfolio" />
+        <meta
+          property="og:image"
+          content="https://www.charlesbinet.com/avatar.jpeg"
+        />
+        <meta name="twitter:card" content="summary" />
+      </Head>
       {/* Top bar: progressive blur layers */}
       {[4, 3, 2, 1].map((i) => (
         <div
