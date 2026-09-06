@@ -17,7 +17,10 @@
 }
 
 body {
-  @apply bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-white font-sans;
+  @apply text-gray-900 dark:text-white font-sans;
+  /* Dark ground everywhere so mobile overscroll / browser chrome never flash grey.
+     Pages with their own light background (legacy /portfolio) paint over this. */
+  background-color: #0d0d0f;
 }
 
 @layer utilities {

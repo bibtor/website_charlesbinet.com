@@ -26,6 +26,10 @@ export function MobileWorkStrip({
     if (!el) return;
     let raf = 0;
     let resumeTimer: ReturnType<typeof setTimeout>;
+    // True drift position kept as a float: iOS rounds scrollLeft on read, so
+    // sub-pixel `scrollLeft += 0.6` reads back unchanged and the drift stalls.
+    let pos = el.scrollLeft;
+
     // Easter egg: fire after hand-scrolling roughly three full loops
     let handDistance = 0;
     let lastLeft = el.scrollLeft;
@@ -34,6 +38,8 @@ export function MobileWorkStrip({
       const third = el.scrollWidth / 3;
       const delta = el.scrollLeft - lastLeft;
       lastLeft = el.scrollLeft;
+      // resync the float position on real user scrolls (not our own rounding)
+      if (Math.abs(el.scrollLeft - pos) > 1.5) pos = el.scrollLeft;
       // ignore the seamless-loop teleports; count only hand scrolling
       if (paused.current && Math.abs(delta) < third * 0.4) {
         handDistance += Math.abs(delta);

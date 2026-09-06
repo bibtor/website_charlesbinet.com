@@ -135,6 +135,45 @@ const FEED: FeedBlock[] = [
 const TEXT_W = "w-[min(560px,92%)]";
 const ASSET_W = "w-[min(1200px,94%)]";
 
+// Video that only plays (and decodes) while near the viewport — with three
+// loop copies of the feed, always-on autoplay melts phones.
+function FeedVideo({
+  src,
+  className,
+  style,
+}: {
+  src: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) v.play().catch(() => {});
+        else v.pause();
+      },
+      { rootMargin: "300px" }
+    );
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <video
+      ref={ref}
+      src={src}
+      loop
+      muted
+      playsInline
+      preload="metadata"
+      className={className}
+      style={style}
+    />
+  );
+}
+
 function FeedBlockView({ block }: { block: FeedBlock }) {
   if (block.type === "header") {
     return (
@@ -161,12 +200,8 @@ function FeedBlockView({ block }: { block: FeedBlock }) {
   if (block.type === "video") {
     return (
       <div className={`${block.narrow ? TEXT_W : ASSET_W} flex flex-col gap-2`}>
-        <video
+        <FeedVideo
           src={block.src}
-          autoPlay
-          loop
-          muted
-          playsInline
           className="w-full h-auto rounded-xl"
           // exception: the source video has a white line baked into its bottom edge
           style={
@@ -183,13 +218,22 @@ function FeedBlockView({ block }: { block: FeedBlock }) {
   return block.srcs.length > 1 ? (
     <div className={`${ASSET_W} grid grid-cols-2 gap-3`}>
       {block.srcs.map((src) => (
-        <img key={src} src={src} alt="Work asset" className="w-full h-auto rounded-xl" />
+        <img
+          key={src}
+          src={src}
+          alt="Work asset"
+          loading="lazy"
+          decoding="async"
+          className="w-full h-auto rounded-xl"
+        />
       ))}
     </div>
   ) : (
     <img
       src={block.srcs[0]}
       alt="Work asset"
+      loading="lazy"
+      decoding="async"
       className={`${block.narrow ? TEXT_W : ASSET_W} h-auto rounded-xl`}
     />
   );
@@ -304,7 +348,16 @@ export function WorkFeed({ initialSrc }: { initialSrc?: string }) {
         {/* extra top padding on mobile clears the fixed × header */}
         <div className="flex flex-col items-center gap-3 pb-3 pt-24 md:pt-3">
           {[0, 1, 2].map((copy) =>
-            FEED.map((block, i) => <FeedBlockView key={`${copy}-${i}`} block={block} />)
+            FEED.map((block, i) => (
+              <div
+                key={`${copy}-${i}`}
+                className="w-full flex justify-center"
+                // skip layout/paint work for far-offscreen blocks
+                style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}
+              >
+                <FeedBlockView block={block} />
+              </div>
+            ))
           )}
         </div>
       </div>

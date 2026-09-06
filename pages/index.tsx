@@ -97,8 +97,11 @@ export default function Home() {
       if (!raf) raf = requestAnimationFrame(update);
     };
     aside.addEventListener("scroll", onScroll, { passive: true });
+    // on mobile the page body scrolls, not the aside
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       aside.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
@@ -110,6 +113,7 @@ export default function Home() {
     >
       <Head>
         <title>Charles - Product & Design leader</title>
+        <meta name="theme-color" content="#0D0D0F" />
         <meta
           name="description"
           content="I fix early SaaS companies' chaos — turning complex, messy products into clear, scalable, and high-converting software."
@@ -230,16 +234,19 @@ export default function Home() {
             WebkitMaskImage: "linear-gradient(to bottom, transparent 178px, black 250px)",
           }}
         >
-          {/* Mobile-only work strip — right after the header, auto-playing */}
+          {/* Mobile-only work strip — right after the header, auto-playing.
+              Unmounted in focus mode so its rAF loop doesn't drain the phone. */}
           <motion.div {...fadeUp(0.1)} className="md:hidden">
-            <MobileWorkStrip
-              assets={ALL_ASSETS}
-              onExplored={unlockNuggets}
-              onAssetClick={(src) => {
-                setSeedSrc(src);
-                setFocusMode(true);
-              }}
-            />
+            {!focusMode && (
+              <MobileWorkStrip
+                assets={ALL_ASSETS}
+                onExplored={unlockNuggets}
+                onAssetClick={(src) => {
+                  setSeedSrc(src);
+                  setFocusMode(true);
+                }}
+              />
+            )}
           </motion.div>
 
           {/* Statement — both paragraphs together, kugiri line reveals */}
