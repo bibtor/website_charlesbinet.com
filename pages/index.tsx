@@ -1,119 +1,113 @@
-import { motion } from "framer-motion";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Linkedin, Dribbble } from "lucide-react";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Inter } from "next/font/google";
+import { Linkedin, Calendar, Dribbble, X } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import Head from "next/head";
+import { WorkPile, ALL_ASSETS } from "@/components/WorkPile";
+import { WorkFeed } from "@/components/WorkFeed";
+import { MobileWorkStrip } from "@/components/MobileWorkStrip";
+import { ClientTicker } from "@/components/ClientTicker";
+import { QuoteStack } from "@/components/QuoteStack";
+import { AppsGrid } from "@/components/AppsGrid";
+import { RevealText } from "@/components/RevealText";
+
+const inter = Inter({ subsets: ["latin"] });
+
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  transition: { delay, duration: 0.5 },
+});
+
+
+const contactButtons = [
+  { href: "https://www.linkedin.com/in/charles-binet/", label: "LinkedIn", Icon: Linkedin },
+  { href: "https://cal.com/charlesbinet/15min?overlayCalendar=true", label: "Book a call", Icon: Calendar },
+  { href: "https://dribbble.com/charles_b", label: "Dribbble", Icon: Dribbble },
+];
+
+// Muted body with white inline emphasis, plkv-style
+const Em = ({ children }: { children: React.ReactNode }) => (
+  <span className="text-white">{children}</span>
+);
 
 export default function Home() {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [isHovered, setIsHovered] = useState(false);
-  const [isAvatarHovered, setIsAvatarHovered] = useState(false);
-  const [isMinesquadHovered, setIsMinesquadHovered] = useState(false);
-  const [isDatasweepHovered, setIsDatasweepHovered] = useState(false);
-  const [isWhalesNestHovered, setIsWhalesNestHovered] = useState(false);
-  const [isPictokitHovered, setIsPictokitHovered] = useState(false);
-  const [isWorkHovered, setIsWorkHovered] = useState(false);
+  const asideRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [focusMode, setFocusMode] = useState(false);
+  const [seedSrc, setSeedSrc] = useState<string | undefined>(undefined);
 
-  // Tooltip states for individual icons
-  const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
-
-  // Email interaction states
-  const [isEmailRevealed, setIsEmailRevealed] = useState(false);
-  const [isEmailCopied, setIsEmailCopied] = useState(false);
-  const [isEmailHovered, setIsEmailHovered] = useState(false);
-
-  // Work assets cycling states
-  const [currentAssetIndex, setCurrentAssetIndex] = useState<{
-    [key: string]: number;
-  }>({
-    depict: 0,
-    validio: 0,
-    curb: 0,
-    zettle: 0,
-    daresay: 0,
-  });
-
-  // Work assets configuration
-  const workAssets = {
-    depict: ["depict01.png", "depict02.png", "depict03.png", "depict04.png"],
-    validio: ["validio01.png", "validio02.png", "validio03.png"],
-    curb: ["curb01.png", "curb02.png", "curb03.png"],
-    zettle: ["zettle01.png", "zettle02.png", "zettle03.png", "zettle04.png"],
-    daresay: ["daresay01.png", "daresay02.png", "daresay03.png"],
-  };
-
-  const handleEmailClick = async () => {
-    if (!isDesktop && !isEmailRevealed) {
-      // Mobile: first tap reveals email
-      setIsEmailRevealed(true);
-    } else {
-      // Desktop click or mobile second tap: copy to clipboard
-      try {
-        await navigator.clipboard.writeText("charlesbinet@proton.me");
-        setIsEmailCopied(true);
-        setTimeout(() => setIsEmailCopied(false), 2000);
-      } catch (err) {
-        console.error("Failed to copy email:", err);
-      }
-    }
-  };
-
-  const handleEmailHover = () => {
-    if (isDesktop) {
-      setIsEmailRevealed(true);
-      setIsEmailHovered(true);
-    }
-  };
-
-  const handleEmailLeave = () => {
-    if (isDesktop) {
-      setIsEmailHovered(false);
-      setIsEmailRevealed(false);
-    }
-  };
-
-  // Handle work assets cycling
+  // Easter egg: nuggets unlock after playing through all the work assets ~3 times
+  const [nuggetsUnlocked, setNuggetsUnlocked] = useState(false);
+  const nuggetsRef = useRef<HTMLDivElement>(null);
+  const unlockNuggets = useCallback(() => setNuggetsUnlocked(true), []);
   useEffect(() => {
-    if (!hoveredIcon || !workAssets[hoveredIcon as keyof typeof workAssets])
-      return;
+    if (!nuggetsUnlocked) return;
+    const t = setTimeout(
+      () => nuggetsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+      400
+    );
+    return () => clearTimeout(t);
+  }, [nuggetsUnlocked]);
 
-    const interval = setInterval(() => {
-      setCurrentAssetIndex((prev) => {
-        const company = hoveredIcon as keyof typeof workAssets;
-        const assetCount = workAssets[company].length;
-        return {
-          ...prev,
-          [company]: (prev[company] + 1) % assetCount,
-        };
-      });
-    }, 800); // Change image every 0.8 seconds
+  // Escape leaves focus mode
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFocusMode(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [hoveredIcon]);
+  // The portfolio trigger lives inside kugiri-split text; the split clones DOM
+  // nodes, which drops React's synthetic handlers — so delegate the click.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest("[data-open-portfolio]")) {
+        setSeedSrc(undefined);
+        setFocusMode(true);
+      }
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
 
-  const iconVariants = {
-    initial: {
-      opacity: 0,
-    },
-    animate: (custom: { rotate: number }) => ({
-      opacity: 1,
-      rotate: isDesktop ? custom.rotate : 0,
-    }),
-    hover: {
-      rotate: 0,
-    },
-  };
-
-  const iconTransition = {
-    duration: 0.3,
-    ease: "easeOut",
-  };
+  // Content fades out progressively as it scrolls up toward the fixed header.
+  // Text dissolves line by line thanks to kugiri's [data-line] splits; other
+  // blocks (badges, cards, quote paragraphs) fade as .fade-unit elements.
+  useEffect(() => {
+    const aside = asideRef.current;
+    const header = headerRef.current;
+    if (!aside || !header) return;
+    const FADE = 72; // px of travel over which a unit dissolves
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const headerBottom = header.getBoundingClientRect().bottom;
+      aside
+        .querySelectorAll<HTMLElement>("[data-line], .fade-unit")
+        .forEach((el) => {
+          const top = el.getBoundingClientRect().top;
+          const p = Math.min(1, Math.max(0, (top - headerBottom) / FADE));
+          el.style.opacity = String(p * p); // ease-in — snappy dissolve near the header
+        });
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    aside.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      aside.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   return (
-    <main className="min-h-screen bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-white transition-colors duration-300">
+    <main
+      className={`${inter.className} min-h-screen text-white antialiased`}
+      style={{ backgroundColor: "#0D0D0F", letterSpacing: "-0.01em" }}
+    >
       <Head>
         <title>Charles - Product & Design leader</title>
         <meta
@@ -127,916 +121,316 @@ export default function Home() {
           content="I fix early SaaS companies' chaos — turning complex, messy products into clear, scalable, and high-converting software."
         />
         <meta property="og:url" content="https://www.charlesbinet.com" />
-        <meta
-          property="og:image"
-          content="https://www.charlesbinet.com/avatar.jpeg"
-        />
+        <meta property="og:image" content="https://www.charlesbinet.com/avatar.jpeg" />
         <meta name="twitter:card" content="summary" />
-        <meta
-          name="twitter:title"
-          content="Charles - Product & Design leader"
-        />
+        <meta name="twitter:title" content="Charles - Product & Design leader" />
         <meta
           name="twitter:description"
           content="I fix early SaaS companies' chaos — turning complex, messy products into clear, scalable, and high-converting software."
         />
-        <meta
-          name="twitter:image"
-          content="https://www.charlesbinet.com/avatar.jpeg"
-        />
+        <meta name="twitter:image" content="https://www.charlesbinet.com/avatar.jpeg" />
       </Head>
-      <ThemeToggle />
 
-      <div className="max-w-[640px] mx-auto p-8 min-h-screen flex flex-col justify-center">
+      <div className="flex flex-col md:flex-row md:h-screen">
+        {/* Fixed header — persists across normal and focus mode.
+            Top padding matches the 20px side padding. */}
         <motion.div
-          className="flex flex-col-reverse items-start gap-4 sm:flex-row sm:items-start mb-4"
-          onHoverStart={() => setIsAvatarHovered(true)}
-          onHoverEnd={() => setIsAvatarHovered(false)}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0, duration: 0.5 }}
+          ref={headerRef}
+          className="fixed top-0 left-0 z-30 w-full md:w-1/3 px-5 pt-5 pb-3 flex flex-col gap-2.5"
+          {...fadeUp(0)}
         >
-          <motion.p
-            className="text-lg font-bold text-gray-900 dark:text-white"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Hi, I'm Charles, software designer fixing
-            <br />
-            early SaaS companies chaos.
-            <br />
-            I turn complex, messy products into
-            <br />
-            clear, scalable, and high-converting software.
-          </motion.p>
+          {/* ID card collapses away in focus mode, morphing the header into just the × */}
           <motion.div
-            className="w-12 h-12 rounded-full shadow-lg sm:ml-4 relative flex-shrink-0 flex items-center justify-center"
-            initial={{ opacity: 0, rotate: 0 }}
+            className="overflow-hidden"
+            initial={false}
             animate={{
-              opacity: 1,
-              rotate: isAvatarHovered ? 183 : 3,
+              height: focusMode ? 0 : "auto",
+              opacity: focusMode ? 0 : 1,
+              marginBottom: focusMode ? -10 : 0,
             }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            onHoverStart={() => setHoveredIcon("avatar")}
-            onHoverEnd={() => setHoveredIcon(null)}
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
           >
-            <Image
-              src="/avatar.jpeg"
-              alt="Charles Binet's avatar"
-              width={48}
-              height={48}
-              className="rounded-full block"
-            />
-            {hoveredIcon === "avatar" && (
-              <div
-                className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                             bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                             px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-              >
-                Heyyy!
+            <div
+              className="rounded-2xl p-4 flex items-start justify-between gap-4"
+              style={{ backgroundColor: "#171719" }}
+            >
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[15px] font-medium text-white">Charles Binet</span>
+                <span className="text-[13px] text-white/50">Product & Design leader</span>
+                <span className="text-[13px] text-white/50">SaaS, AI and indie products</span>
               </div>
-            )}
+              <Image
+                src="/avatar.jpeg"
+                alt="Charles Binet's avatar"
+                width={48}
+                height={48}
+                className="rounded-lg w-12 h-12 object-cover flex-shrink-0"
+              />
+            </div>
           </motion.div>
+          <div className="h-10 relative">
+            <AnimatePresence initial={false} mode="wait">
+              {focusMode ? (
+                <motion.button
+                  key="close"
+                  aria-label="Close portfolio"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-colors duration-200"
+                  style={{ backgroundColor: "#171719" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setFocusMode(false)}
+                >
+                  <X className="w-4 h-4" />
+                </motion.button>
+              ) : (
+                <motion.div
+                  key="contacts"
+                  className="flex gap-2 h-full"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  {contactButtons.map(({ href, label, Icon }) => (
+                    <motion.a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      title={label}
+                      className="flex-1 h-full rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-colors duration-200"
+                      style={{ backgroundColor: "#171719" }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </motion.a>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </motion.div>
 
-        {/* Intro / positioning text */}
-        <motion.div
-          className="text-lg mb-4"
-          style={{ color: "#75777A" }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
+        {/* Left column — collapses away in focus mode */}
+        <aside
+          ref={asideRef}
+          className={`w-full md:h-screen md:overflow-y-auto scrollbar-hide flex flex-col gap-20 overflow-x-hidden transition-all duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            focusMode
+              ? "max-h-0 overflow-hidden pt-0 pb-0 md:max-h-none md:w-[0%] px-0 opacity-0 pointer-events-none"
+              : "max-h-none pt-[248px] pb-10 md:w-1/3 px-5 opacity-100"
+          }`}
+          style={{
+            // Spatial fade near the fixed header: dissolves everything the JS
+            // per-unit fade can't reach — card backgrounds included
+            maskImage: "linear-gradient(to bottom, transparent 178px, black 250px)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 178px, black 250px)",
+          }}
         >
-          <p>
-            I audit your product, build your foundational design system, scope
-            and execute on your product flows and website, async. Let's chat!
-          </p>
-        </motion.div>
-
-        {/* Chat links */}
-        <motion.div
-          className="text-lg mb-8 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-6"
-          style={{ color: "#75777A" }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.5 }}
-        >
-          <a
-            href="https://cal.com/charlesbinet/15min?overlayCalendar=true"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-black dark:text-white whitespace-nowrap hover:opacity-70 transition-all duration-200"
-          >
-            Book time on Cal
-          </a>
-          <a
-            href="https://www.linkedin.com/in/charles-binet/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-black dark:text-white whitespace-nowrap hover:opacity-70 transition-all duration-200"
-          >
-            Contact on LinkedIn
-          </a>
-          <a
-            href="https://wa.me/46739047595?text=Hi%20Charles%2C%20I%20saw%20your%20website%20and%20I%27d%20love%20to%20chat%21"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-black dark:text-white whitespace-nowrap hover:opacity-70 transition-all duration-200"
-          >
-            DM on Whatsapp
-          </a>
-        </motion.div>
-
-        {/* Line divider */}
-        <motion.div
-          className="w-full mb-8 ml-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          <svg
-            width="100%"
-            height="2"
-            viewBox="0 0 1000 2"
-            preserveAspectRatio="none"
-            className="block"
-          >
-            <path
-              d="M 0 1 L 1000 1"
-              stroke="#75777A"
-              strokeWidth="1"
-              strokeDasharray="8 16"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
+          {/* Mobile-only work strip — right after the header, auto-playing */}
+          <motion.div {...fadeUp(0.1)} className="md:hidden">
+            <MobileWorkStrip
+              assets={ALL_ASSETS}
+              onExplored={unlockNuggets}
+              onAssetClick={(src) => {
+                setSeedSrc(src);
+                setFocusMode(true);
+              }}
             />
-          </svg>
-        </motion.div>
-
-        {/* Worked with row */}
-        <motion.div
-          className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12 group"
-          onHoverStart={() => setIsWorkHovered(true)}
-          onHoverEnd={() => setIsWorkHovered(false)}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-        >
-          <motion.p
-            className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Working now with
-          </motion.p>
-
-          <motion.div
-            className="flex items-center"
-            variants={{
-              animate: {
-                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-              },
-            }}
-            initial="initial"
-            animate="animate"
-          >
-            <motion.a
-              href="https://brickanta.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg bg-white transition-all duration-100 ease-out
-                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
-              custom={{ rotate: -2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWorkHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("brickanta")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/brickanta.png"
-                alt="Brickanta AI"
-                width={96}
-                height={96}
-                quality={100}
-                className="w-12 h-12 rounded-xl object-contain p-1.5"
-              />
-              {hoveredIcon === "brickanta" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Brickanta AI
-                </div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://www.eiraai.co/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
-                         ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
-              custom={{ rotate: 2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWorkHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("eira")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/eira.png"
-                alt="Eira AI"
-                width={96}
-                height={96}
-                quality={100}
-                className="w-12 h-12 rounded-xl object-cover"
-              />
-              {hoveredIcon === "eira" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Eira AI
-                </div>
-              )}
-            </motion.a>
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12 group"
-          onHoverStart={() => {
-            setIsDatasweepHovered(true);
-            setIsMinesquadHovered(true);
-            setIsWhalesNestHovered(true);
-            setIsPictokitHovered(true);
-          }}
-          onHoverEnd={() => {
-            setIsDatasweepHovered(false);
-            setIsMinesquadHovered(false);
-            setIsWhalesNestHovered(false);
-            setIsPictokitHovered(false);
-          }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <motion.p
-            className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Creator of
-          </motion.p>
+          {/* Statement — both paragraphs together, kugiri line reveals */}
+          <div className="flex flex-col gap-4">
+            <RevealText className="text-[19px] leading-[1.5] text-white/50" delay={0.15}>
+              <Em>I fix early SaaS companies' chaos</Em>, turning complex, messy products into{" "}
+              <Em>clear, scalable, and high-converting software</Em>.
+            </RevealText>
 
-          <motion.div
-            className="flex items-center"
-            variants={{
-              animate: {
-                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-              },
-            }}
-            initial="initial"
-            animate="animate"
-          >
-            <motion.a
-              href="https://datasweeper.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
-                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
-              custom={{ rotate: -2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isDatasweepHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("datasweep")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/datasweeper.png"
-                alt="Datasweeper"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "datasweep" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Datasweeper - Clean your Mac tool
-                </div>
-              )}
-            </motion.a>
+            <RevealText className="text-[19px] leading-[1.5] text-white/50" delay={0.3}>
+              I audit your product, build your foundational design system, scope and execute your
+              product flows and website, async.
+            </RevealText>
+          </div>
 
-            <motion.a
-              href="https://www.minesquad.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out 
-                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
-              custom={{ rotate: -3 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isMinesquadHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("minesquad")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/minesquad.png"
-                alt="Minesquad"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "minesquad" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Minesquad - A giveback game
-                </div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://www.whalesnest.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
-                         ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
-              custom={{ rotate: 2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWhalesNestHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("whalesnest")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/whalesnest.png"
-                alt="Whale's Nest"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "whalesnest" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Whale's Nest - Investor tracking
-                </div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://pictokit.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
-                         ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
-              custom={{ rotate: -2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isPictokitHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("pictokit")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/pictokit.png"
-                alt="PictoKit"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "pictokit" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  PictoKit - Your shortcut to icons & images
-                </div>
-              )}
-            </motion.a>
+          {/* Client ticker */}
+          <motion.div {...fadeUp(0.4)}>
+            <ClientTicker />
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          className="flex flex-col items-start gap-4 sm:flex-row sm:items-center mb-12 group"
-          onHoverStart={() => setIsWorkHovered(true)}
-          onHoverEnd={() => setIsWorkHovered(false)}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <motion.p
-            className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            I headed product & design at
-          </motion.p>
-
-          <motion.div
-            className="flex items-center"
-            variants={{
-              animate: {
-                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-              },
-            }}
-            initial="initial"
-            animate="animate"
-          >
-            <motion.a
-              href="https://depict.ai/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out 
-                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
-              custom={{ rotate: 4 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWorkHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("depict")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/depict.jpg"
-                alt="Depict"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "depict" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Depict AI
-                </div>
-              )}
-              {hoveredIcon === "depict" && workAssets.depict && (
-                <motion.div
-                  className="absolute top-full mt-2 pointer-events-none z-20 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[360px] md:h-[360px] lg:w-[400px] lg:h-[400px]"
-                  style={{
-                    left: 0,
-                    transform: "translateX(-100%)", // Align top-right of asset with bottom-left of icon
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Image
-                    src={`/${workAssets.depict[currentAssetIndex.depict]}`}
-                    alt="Depict work"
-                    width={320}
-                    height={320}
-                    className="rounded-xl shadow-lg w-full h-full"
-                    style={{
-                      objectFit: "contain",
-                      aspectRatio: "1/1",
-                      backgroundColor: "transparent",
-                    }}
-                  />
-                </motion.div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://validio.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
-                         mx-1 md:-mx-[3px] md:group-hover:mx-1 relative"
-              custom={{ rotate: -2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWorkHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("validio")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/validio.png"
-                alt="Validio"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "validio" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Validio
-                </div>
-              )}
-              {hoveredIcon === "validio" && workAssets.validio && (
-                <motion.div
-                  className="absolute top-full mt-2 pointer-events-none z-20 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[360px] md:h-[360px] lg:w-[400px] lg:h-[400px]"
-                  style={{
-                    left: 0,
-                    transform: "translateX(-100%)", // Align top-right of asset with bottom-left of icon
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Image
-                    src={`/${workAssets.validio[currentAssetIndex.validio]}`}
-                    alt="Validio work"
-                    width={320}
-                    height={320}
-                    className="rounded-xl shadow-lg w-full h-full"
-                    style={{
-                      objectFit: "contain",
-                      aspectRatio: "1/1",
-                      backgroundColor: "transparent",
-                    }}
-                  />
-                </motion.div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://www.linkedin.com/company/curb-food/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transition-all duration-100 ease-out
-                         mx-1 md:-mx-[3px] md:group-hover:mx-1 relative"
-              style={{ backgroundColor: "#CE4129" }}
-              custom={{ rotate: -3 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWorkHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("curb")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/curb.png"
-                alt="Curb"
-                width={32}
-                height={32}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "curb" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Curb Food
-                </div>
-              )}
-              {hoveredIcon === "curb" && workAssets.curb && (
-                <motion.div
-                  className="absolute top-full mt-2 pointer-events-none z-20 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[360px] md:h-[360px] lg:w-[400px] lg:h-[400px]"
-                  style={{
-                    left: 0,
-                    transform: "translateX(-100%)", // Align top-right of asset with bottom-left of icon
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Image
-                    src={`/${workAssets.curb[currentAssetIndex.curb]}`}
-                    alt="Curb work"
-                    width={320}
-                    height={320}
-                    className="rounded-xl shadow-lg w-full h-full"
-                    style={{
-                      objectFit: "contain",
-                      aspectRatio: "1/1",
-                      backgroundColor: "transparent",
-                    }}
-                  />
-                </motion.div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://www.zettle.com/se"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl shadow-lg transition-all duration-100 ease-out
-                         mx-1 md:-mx-[3px] md:group-hover:mx-1 relative"
-              custom={{ rotate: 2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWorkHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("zettle")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/zettle.png"
-                alt="Zettle"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "zettle" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Zettle by PayPal
-                </div>
-              )}
-              {hoveredIcon === "zettle" && workAssets.zettle && (
-                <motion.div
-                  className="absolute top-full mt-2 pointer-events-none z-20 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[360px] md:h-[360px] lg:w-[400px] lg:h-[400px]"
-                  style={{
-                    left: 0,
-                    transform: "translateX(-100%)", // Align top-right of asset with bottom-left of icon
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Image
-                    src={`/${workAssets.zettle[currentAssetIndex.zettle]}`}
-                    alt="Zettle work"
-                    width={320}
-                    height={320}
-                    className="rounded-xl shadow-lg w-full h-full"
-                    style={{
-                      objectFit: "contain",
-                      aspectRatio: "1/1",
-                      backgroundColor: "transparent",
-                    }}
-                  />
-                </motion.div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://daresay.co/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transition-all duration-100 ease-out
-                         ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
-              style={{ backgroundColor: "#000000" }}
-              custom={{ rotate: -1 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isWorkHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("daresay")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Image
-                src="/daresay.png"
-                alt="Daresay"
-                width={22}
-                height={22}
-                style={{ filter: "invert(1)" }}
-              />
-              {hoveredIcon === "daresay" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  Daresay
-                </div>
-              )}
-              {hoveredIcon === "daresay" && workAssets.daresay && (
-                <motion.div
-                  className="absolute top-full mt-2 pointer-events-none z-20 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[360px] md:h-[360px] lg:w-[400px] lg:h-[400px]"
-                  style={{
-                    left: 0,
-                    transform: "translateX(-100%)", // Align top-right of asset with bottom-left of icon
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Image
-                    src={`/${workAssets.daresay[currentAssetIndex.daresay]}`}
-                    alt="Daresay work"
-                    width={320}
-                    height={320}
-                    className="rounded-xl shadow-lg w-full h-full"
-                    style={{
-                      objectFit: "contain",
-                      aspectRatio: "1/1",
-                      backgroundColor: "transparent",
-                    }}
-                  />
-                </motion.div>
-              )}
-            </motion.a>
+          {/* Domains */}
+          <motion.div className="grid grid-cols-2 gap-x-4 gap-y-1.5" {...fadeUp(0.45)}>
+            {[
+              "Zero to One projects",
+              "Interface design",
+              "Branding",
+              "Motion design",
+              "Wireframing",
+              "Product strategy",
+              "Illustration & 3D",
+              "Prototyping",
+              "Design System",
+              "Copywriting",
+              "Growth",
+            ].map((domain) => (
+              <span key={domain} className="fade-unit text-[19px] leading-[1.5] text-white/50">
+                {domain}
+              </span>
+            ))}
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          className="flex flex-col items-start gap-4 sm:flex-row sm:items-center group"
-          onHoverStart={() => setIsHovered(true)}
-          onHoverEnd={() => setIsHovered(false)}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          <motion.p
-            className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Find me here
-          </motion.p>
+          {/* Creator of — inline emphasis */}
+          <RevealText className="text-[19px] leading-[1.5] text-white/50" delay={0.5}>
+            Creator of MacOS apps{" "}
+            <a href="https://datasweeper.app" target="_blank" rel="noopener noreferrer" className="text-white hover:opacity-70 transition-opacity">
+              Datasweeper
+            </a>
+            , and{" "}
+            <a href="https://pictokit.app" target="_blank" rel="noopener noreferrer" className="text-white hover:opacity-70 transition-opacity">
+              PictoKit
+            </a>
+            . iOS minesweeper give back app{" "}
+            <a href="https://www.minesquad.app/" target="_blank" rel="noopener noreferrer" className="text-white hover:opacity-70 transition-opacity">
+              Minesquad
+            </a>
+            . Web app investor tracker{" "}
+            <a href="https://www.whalesnest.app/" target="_blank" rel="noopener noreferrer" className="text-white hover:opacity-70 transition-opacity">
+              Whale's Nest
+            </a>
+            .
+          </RevealText>
 
-          <motion.div
-            className="flex items-center"
-            variants={{
-              animate: {
-                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-              },
-            }}
-            initial="initial"
-            animate="animate"
-          >
-            <motion.a
-              href="https://www.linkedin.com/in/charles-binet/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transition-all duration-100 ease-out 
-                         mr-1 md:-mr-[3px] md:group-hover:mr-1 relative"
-              style={{ backgroundColor: "#0B66C2" }}
-              custom={{ rotate: -3 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("linkedin")}
-              onHoverEnd={() => setHoveredIcon(null)}
+          {/* Apps grid */}
+          <motion.div {...fadeUp(0.6)}>
+            <AppsGrid />
+          </motion.div>
+
+          {/* Prompts */}
+          <RevealText className="text-[19px] leading-[1.5] text-white/50" delay={0.7}>
+            Check out my{" "}
+            <button
+              data-open-portfolio
+              className="text-white hover:opacity-70 transition-opacity cursor-pointer"
             >
-              <Linkedin className="w-6 h-6 text-white" />
-              {hoveredIcon === "linkedin" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  @charles-binet
-                </div>
-              )}
-            </motion.a>
-
-            <motion.a
-              href="https://dribbble.com/charles_b"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transition-all duration-100 ease-out
-                         mx-1 md:-mx-[3px] md:group-hover:mx-1 relative"
-              style={{ backgroundColor: "#EA4C89" }}
-              custom={{ rotate: 4 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("dribbble")}
-              onHoverEnd={() => setHoveredIcon(null)}
-            >
-              <Dribbble className="w-6 h-6 text-white" />
-              {hoveredIcon === "dribbble" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  @charles_b
-                </div>
-              )}
-            </motion.a>
-
-            <motion.a
+              portfolio
+            </button>
+            , level up your design career with{" "}
+            <a
               href="https://adplist.org/mentors/charles-binet"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transition-all duration-100 ease-out
-                         ml-1 md:-ml-[3px] md:group-hover:ml-1 relative"
-              custom={{ rotate: -2 }}
-              variants={iconVariants}
-              transition={iconTransition}
-              animate={isHovered ? "hover" : "animate"}
-              onHoverStart={() => setHoveredIcon("adplist")}
-              onHoverEnd={() => setHoveredIcon(null)}
+              className="text-white hover:opacity-70 transition-opacity"
             >
-              <Image
-                src="/adpList.png"
-                alt="ADPlist"
-                width={48}
-                height={48}
-                className="rounded-xl"
-              />
-              {hoveredIcon === "adplist" && (
-                <div
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 
-                               bg-dark-bg dark:bg-light-bg text-light-bg dark:text-dark-bg
-                               px-2 py-1 rounded text-sm whitespace-nowrap z-10"
-                >
-                  @charles-binet
-                </div>
-              )}
-            </motion.a>
-          </motion.div>
-        </motion.div>
+              coaching
+            </a>
+            , or just{" "}
+            <a
+              href="https://www.linkedin.com/in/charles-binet/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:opacity-70 transition-opacity"
+            >
+              connect with me
+            </a>{" "}
+            to chat.
+          </RevealText>
 
-        {/* Line divider */}
-        <motion.div
-          className="w-full mt-16 mb-8 ml-0"
+          {/* Quotes from the about page */}
+          <motion.div {...fadeUp(0.8)}>
+            <QuoteStack />
+          </motion.div>
+
+          {/* Principles */}
+          <motion.div className="flex flex-col gap-2 pb-8" {...fadeUp(0.9)}>
+            <span className="fade-unit text-[19px] leading-[1.5] text-white">Principles</span>
+            {[
+              "Converge for decisions",
+              "Disperse for execution",
+              "Execute small & fast",
+              "Envision big & thoughtfully",
+              "Visuals over manuals",
+              "Don't simplify, make it easy",
+              "Details, details, details",
+              "Solutions already exists, just look around",
+            ].map((principle) => (
+              <span key={principle} className="fade-unit text-[19px] leading-[1.5] text-white/50">
+                {principle}
+              </span>
+            ))}
+          </motion.div>
+
+          {/* Nuggets — easter egg, unlocked by playing through all the work */}
+          {nuggetsUnlocked && (
+            <motion.div
+              ref={nuggetsRef}
+              className="flex flex-col gap-2 pb-8"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+            >
+              <span className="fade-unit text-[19px] leading-[1.5] text-white">
+                Nuggets (well deserved scroll master!)
+              </span>
+              {[
+                "Married. Dad of three.",
+                "French expat. Living in the North of Sweden.",
+                "Assumed fan of the show How things work.",
+                "Doing Squash, Judo, Swimming, and walking.",
+                "Playing video games at 3, I was amazed. To this day, interacting with a screen still feels like magic.",
+              ].map((nugget) => (
+                <span key={nugget} className="fade-unit text-[19px] leading-[1.5] text-white/50">
+                  {nugget}
+                </span>
+              ))}
+            </motion.div>
+          )}
+        </aside>
+
+        {/* Right column — grows to full screen in focus mode */}
+        <motion.section
+          className={`relative w-full md:flex-1 md:h-screen ${
+            focusMode ? "h-[100dvh]" : "hidden md:block"
+          }`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
         >
-          <svg
-            width="100%"
-            height="2"
-            viewBox="0 0 1000 2"
-            preserveAspectRatio="none"
-            className="block"
-          >
-            <path
-              d="M 0 1 L 1000 1"
-              stroke="#75777A"
-              strokeWidth="1"
-              strokeDasharray="8 16"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        </motion.div>
-
-        {/* Portfolio text */}
-        <motion.p
-          className="text-lg"
-          style={{ color: "#75777A" }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0, duration: 0.5 }}
-        >
-          You want to check out my work?{" "}
-          <Link
-            href="/portfolio"
-            className="text-black dark:text-white hover:underline transition-all duration-200"
-          >
-            Portfolio here
-          </Link>
-        </motion.p>
-
-        {/* Coaching text */}
-        <motion.p
-          className="text-lg mt-4"
-          style={{ color: "#75777A" }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.15, duration: 0.5 }}
-        >
-          You need coaching to level up your design career?{" "}
-          <a
-            href="https://adplist.org/mentors/charles-binet"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-black dark:text-white hover:underline transition-all duration-200"
-          >
-            Book me here
-          </a>
-        </motion.p>
-
-        {/* Advising / chat text */}
-        <motion.p
-          className="text-lg mt-4"
-          style={{ color: "#75777A" }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.3, duration: 0.5 }}
-        >
-          You need product or design advising, or just want to chat?{" "}
-          <a
-            href="https://x.com/CharlesTenib"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-black dark:text-white hover:underline transition-all duration-200"
-          >
-            DM me here
-          </a>
-        </motion.p>
+          {/* Snappy crossfade: the pressed asset scales up as the pile hands
+              off to the feed, which opens centered on that same asset */}
+          <AnimatePresence initial={false}>
+            {focusMode ? (
+              <motion.div
+                key="feed"
+                className="absolute inset-0"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <WorkFeed initialSrc={seedSrc} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="pile"
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.03 }}
+                transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <WorkPile
+                  onExplored={unlockNuggets}
+                  onAssetClick={(src) => {
+                    setSeedSrc(src);
+                    setFocusMode(true);
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.section>
       </div>
     </main>
   );

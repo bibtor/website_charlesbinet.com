@@ -17,7 +17,7 @@ export const ThemeToggle: React.FC = () => {
   return (
     <motion.button
       onClick={toggleTheme}
-      className="fixed top-6 right-6 p-3"
+      className="fixed top-6 right-6 p-3 z-50"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       aria-label="Toggle theme"

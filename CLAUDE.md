@@ -1,92 +1,45 @@
 # Charles Binet — Personal Portfolio
 
 ## Overview
-Minimalist personal portfolio site for a product designer. Every detail is intentional. The quality bar is a top-tier product designer portfolio — clean, confident, understated.
+Minimalist personal portfolio for a product designer. The homepage was fully redesigned (Sept 2026) in a plkv.works-inspired direction: dark-only, single accentless palette, muted text with white inline emphasis, and a 3D-animated work showcase. Quality bar: top-tier product designer portfolio.
 
 ## Tech
 - Next.js 15 (Pages Router) + TypeScript + Tailwind CSS 3
-- Framer Motion for all animations
-- lucide-react for icons
-- No external state management — local `useState` only
-- Dev server runs on port 4000 (`next dev -p 4000`)
+- Framer Motion for all animation; **kugiri** for text line-splitting/reveals
+- Inter via `next/font` (homepage); lucide-react icons
+- Dev server: port 4000 (`npx next dev -p 4000`)
 
-## Design Principles
-1. **Minimalism** — remove anything that doesn't earn its place
-2. **Dark/light parity** — every element must look intentional in both modes
-3. **Motion with purpose** — animations guide attention, never decorate
-4. **Typography hierarchy** — Recoleta (serif) for headings, system sans for body
-5. **Whitespace is a feature** — generous spacing, never cramped
+## Homepage design system (pages/index.tsx)
+- Background `#0D0D0F`, dark only (no theme toggle on homepage)
+- Panels: `rgba(255,255,255,0.04)`; opaque equivalent `#171719` (use for anything that must not see-through, e.g. fixed header squares)
+- Text: white for emphasis, `text-white/50` muted body, `white/40` captions
+- One content size: 19px / 1.5 line-height; component chrome 13–15px
+- Letter-spacing -0.01em globally on `<main>`
 
-## Color Tokens
-| Token | Value | Usage |
-|-------|-------|-------|
-| `bg-light-bg` | `#E8E8E8` | Light mode background |
-| `bg-dark-bg` | `#181818` | Dark mode background |
-| `text-gray-900` | Tailwind default | Light mode primary text |
-| `dark:text-white` | `#FFFFFF` | Dark mode primary text |
-| Secondary text | `#75777A` | Subheadings, muted text, back links |
+## Homepage layout
+- **Fixed header** (top-left, 20px margins): ID card + 3 contact buttons (LinkedIn / Cal / Dribbble). In focus mode the card collapses and the buttons crossfade to a square × close button.
+- **Left column (33%)**, scrollable, content dissolves near the header via BOTH a CSS mask on the aside and a JS per-unit fade (kugiri `[data-line]` + `.fade-unit` elements): statement paragraphs (kugiri line reveals) → client logo ticker (2 counter-rotating rows) → domains grid → "Creator of" line → 2×2 apps grid (cursor 3D tilt ±14°) → prompts → quotes stack → principles → nuggets (easter egg).
+- **Right column (67%)**: `WorkPile` — one slide at a time, flip-up/push-back 3D transition (direction-aware), cursor tilt, wheel momentum, ↑/↓ arrows + keys, 3s auto-swap. Click seeds **focus mode**.
+- **Focus mode**: left column collapses; `WorkFeed` = forever-scrolling vertical case-study feed (3 copies + scroll wrap), per-project sections (Brickanta, Depict, Zettle, Minesquad, Datasweeper, PictoKit) with header/description/Role/Impact text and images/videos (pairs side-by-side). Arrows jump between project headers (wrap-suppression while smooth scrolling). Opens centered on the clicked asset (`initialSrc`).
+- **Mobile**: vertical pile hidden; `MobileWorkStrip` (280px, auto-drifting, hand-scrollable, images only) sits after the header; app cards stack icon-above-text; focus feed goes full `100dvh`.
 
-Always use `style={{ color: "#75777A" }}` for secondary text (inline, not a Tailwind class).
+## Key components
+- `WorkPile.tsx` — desktop slide showcase; exports `ALL_ASSETS`; SLIDES mirrors the feed's media (solo/pair layout)
+- `WorkFeed.tsx` — focus-mode infinite feed; FEED is the single source of case-study content/order
+- `MobileWorkStrip.tsx` — mobile horizontal marquee
+- `RevealText.tsx` — kugiri masked line reveal (use `opacity:0` pre-split, never `visibility:hidden` — kugiri skips hidden content)
+- `ClientTicker.tsx`, `AppsGrid.tsx`, `QuoteStack.tsx`
+- Easter egg: nuggets unlock after ~3 full manual passes through the assets (WorkPile manual advances / strip hand-scroll distance)
 
-## Typography
-- **Headings**: `font-heading` class → Recoleta, "Noto Serif", Georgia, serif
-- **Body**: system `font-sans` (Tailwind default)
-- Sizes: `text-4xl` for page titles, `text-2xl` for section headings, `text-lg` for body, `text-sm` for tab labels and small UI
+## Gotchas
+- kugiri clones DOM on split → React handlers inside `RevealText` children are lost; use delegated native listeners (see `data-open-portfolio`)
+- `depictvid2.mp4` has a white line baked into its bottom edge — cropped via `clip-path: inset(0 0 2px 0 round …)` wherever rendered
+- Infinite loops (feed/strip) use 3 rendered copies + scrollTop/Left wrap; suppress the wrap during programmatic smooth scrolls
+- Brickanta/Daresay marks need special treatment on dark (white chip bg / invert)
+- `pages/index 2.tsx`, `*.backup`, `Comp 1.mp4`, `msvid1.mp4` are local-only leftovers — do not commit (index 2.tsx would become a live route)
 
-## Animation Conventions (Framer Motion)
-- **Page load entrance**: `initial={{ opacity: 0, y: 10 }}` → `animate={{ opacity: 1, y: 0 }}`, duration 0.5s
-- **Stagger**: 0.2s increments on `delay` (0, 0.2, 0.4, 0.6...)
-- **Content transitions**: `AnimatePresence mode="wait"` with fade in/out
-- **Tab underline**: `layoutId="tab-underline"` with spring physics (`stiffness: 500, damping: 35`)
-- **Hover**: `whileHover`, `whileTap` for interactive elements
-- **Theme toggle**: 180° rotation + opacity fade
-
-## Layout
-- Max width: `max-w-[640px]` centered with `mx-auto`
-- Padding: `p-8`
-- Section spacing: `mb-12` between major sections
-- Full height: `min-h-screen`
-
-## Component Patterns
-
-### Pages
-- Every page: `<main>` with `min-h-screen bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-white transition-colors duration-300`
-- `<ThemeToggle />` fixed top-right on every page
-
-### Portfolio Tabs
-- Tab data defined as `const projects = [{ slug, label }] as const`
-- Active tab synced to URL query param `?project=slug` via `router.replace` (shallow)
-- Selected tab: full text color + animated underline via `layoutId`
-- Unselected tab: `#75777A` with hover transition to full color
-
-### Case Studies
-- Each case study is a separate component in `components/cases/`
-- Naming: `CaseStudy[Name].tsx` (e.g., `CaseStudyDepict.tsx`)
-- Must accept `key` prop for `AnimatePresence` transitions
-- Wrap content in `motion.div` with enter/exit animations
+## Legacy
+- `/portfolio` page (tabs + case components in `components/cases/`) still exists with the old light/dark design but is no longer linked from the homepage; `ThemeToggle`/`ThemeContext` only used there. Recoleta stays for that page (`font-heading`).
 
 ### Metadata
-- Every page must render a `<Head>` (from `next/head`) with `<title>`, `description`, and Open Graph tags — link scrapers otherwise concatenate visible CTA text into the preview title
-- OG image: `https://www.charlesbinet.com/avatar.jpeg`; canonical host is `www.charlesbinet.com` (apex 307-redirects)
-
-### Links
-- Internal: `<Link href="/">` from `next/link`
-- External: `<a>` with `target="_blank" rel="noopener noreferrer"`
-- Back links: `ArrowLeft` icon from lucide + "Back" text, `#75777A` color, hover to full color
-
-## File Structure
-```
-pages/
-  index.tsx          — homepage
-  portfolio.tsx      — portfolio with tabbed case studies
-  _app.tsx           — ThemeProvider wrapper
-  _document.tsx      — theme flash prevention
-components/
-  ThemeContext.tsx    — dark/light mode context + hook
-  ThemeToggle.tsx    — fixed sun/moon toggle button
-  cases/             — case study components
-hooks/
-  useMediaQuery.ts   — responsive breakpoint hook
-styles/
-  globals.css        — Tailwind base + Recoleta font
-```
+- Every page renders `<Head>` with title/description/OG tags; OG image `https://www.charlesbinet.com/avatar.jpeg`; canonical host `www.charlesbinet.com`.
