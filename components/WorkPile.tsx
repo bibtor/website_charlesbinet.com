@@ -13,11 +13,6 @@ type Slide = { srcs: string[]; company: string };
 // Every image and video from the focus-mode feed (no headers or text),
 // keeping the same solo / side-by-side pair layout
 const SLIDES: Slide[] = [
-  { srcs: ["/brick0.png"], company: "Brickanta" },
-  { srcs: ["/brick1.png"], company: "Brickanta" },
-  { srcs: ["/brick2.png"], company: "Brickanta" },
-  { srcs: ["/brick3.png", "/brick4.png"], company: "Brickanta" },
-  { srcs: ["/brick5.png"], company: "Brickanta" },
   { srcs: ["/depictvid1.mp4"], company: "Depict" },
   { srcs: ["/depict1.png"], company: "Depict" },
   { srcs: ["/depict2.png"], company: "Depict" },
@@ -30,9 +25,15 @@ const SLIDES: Slide[] = [
   { srcs: ["/zettle2.png"], company: "Zettle" },
   { srcs: ["/zettle4.png", "/zettle5.gif"], company: "Zettle" },
   { srcs: ["/zettle3.png"], company: "Zettle" },
+  { srcs: ["/brick0.png"], company: "Brickanta" },
+  { srcs: ["/brick1.png"], company: "Brickanta" },
+  { srcs: ["/brick2.png"], company: "Brickanta" },
+  { srcs: ["/brick3.png", "/brick4.png"], company: "Brickanta" },
+  { srcs: ["/brick5.png"], company: "Brickanta" },
   { srcs: ["/minesquad1.png"], company: "Minesquad" },
   { srcs: ["/minesquad2.png"], company: "Minesquad" },
   { srcs: ["/minesquad3.png"], company: "Minesquad" },
+  { srcs: ["/msvid1.mp4", "/msvid2.mp4", "/msvid3.mp4", "/msvid4.mp4"], company: "Minesquad" },
   { srcs: ["/dsvid1.mp4"], company: "Datasweeper" },
   { srcs: ["/dsvid2.mp4"], company: "Datasweeper" },
   { srcs: ["/pictokit_demo_small.mp4"], company: "PictoKit" },
@@ -45,6 +46,15 @@ const isVideo = (src: string) => src.endsWith(".mp4");
 
 // Flat list for the mobile strip
 export const ALL_ASSETS = SLIDES.flatMap((s) => s.srcs);
+
+// Safari won't autoplay from SSR HTML (React omits the muted attribute) —
+// force the muted property and kick playback from a ref
+const safariAutoplay = (v: HTMLVideoElement | null) => {
+  if (!v) return;
+  v.muted = true;
+  v.defaultMuted = true;
+  v.play().catch(() => {});
+};
 
 const AUTO_DELAY = 3000; // ms of idleness before auto-swap
 const SCROLL_THRESHOLD = 90; // wheel px per swap
@@ -213,28 +223,69 @@ export function WorkPile({
               className="w-full h-full flex items-center justify-center gap-4"
               style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
             >
-              {slide.srcs.map((src, i) => {
-                const media = {
-                  className:
-                    "max-h-full min-w-0 w-auto h-auto rounded-lg shadow-2xl object-contain",
-                  style: {
-                    maxWidth: slide.srcs.length > 1 ? "calc(50% - 8px)" : "100%",
-                    // exception: source video has a white line baked into its bottom edge
-                    ...(src === "/depictvid2.mp4"
-                      ? { clipPath: "inset(0 0 2px 0 round 8px)" }
-                      : {}),
-                  },
-                  // On pair slides the second item lands a beat after the first
-                  initial: i === 0 ? false : { opacity: 0, y: 28 },
-                  animate: { opacity: 1, y: 0 },
-                  transition: { ...FLIP_SPRING, delay: i * 0.12 },
-                } as const;
-                return isVideo(src) ? (
-                  <motion.video key={src} src={src} autoPlay loop muted playsInline {...media} />
-                ) : (
-                  <motion.img key={src} src={src} alt={`${slide.company} work`} {...media} />
-                );
-              })}
+              {slide.srcs.length === 4 ? (
+                // 2x2 grid of square videos/images, sized to the stage height
+                <div
+                  className="grid grid-cols-2 grid-rows-2 gap-3 max-h-full max-w-full"
+                  style={{ aspectRatio: "1", height: "100%" }}
+                >
+                  {slide.srcs.map((src, i) => {
+                    const cls = "w-full h-full min-h-0 object-cover rounded-lg shadow-2xl";
+                    const anim = {
+                      initial: i === 0 ? false : { opacity: 0, y: 28 },
+                      animate: { opacity: 1, y: 0 },
+                      transition: { ...FLIP_SPRING, delay: i * 0.08 },
+                    } as const;
+                    return isVideo(src) ? (
+                      <motion.video
+                        key={src}
+                        ref={safariAutoplay}
+                        src={src}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className={cls}
+                        {...anim}
+                      />
+                    ) : (
+                      <motion.img key={src} src={src} alt={`${slide.company} work`} className={cls} {...anim} />
+                    );
+                  })}
+                </div>
+              ) : (
+                slide.srcs.map((src, i) => {
+                  const media = {
+                    className:
+                      "max-h-full min-w-0 w-auto h-auto rounded-lg shadow-2xl object-contain",
+                    style: {
+                      maxWidth: slide.srcs.length > 1 ? "calc(50% - 8px)" : "100%",
+                      // exception: source video has a white line baked into its bottom edge
+                      ...(src === "/depictvid2.mp4"
+                        ? { clipPath: "inset(0 0 2px 0 round 8px)" }
+                        : {}),
+                    },
+                    // On pair slides the second item lands a beat after the first
+                    initial: i === 0 ? false : { opacity: 0, y: 28 },
+                    animate: { opacity: 1, y: 0 },
+                    transition: { ...FLIP_SPRING, delay: i * 0.12 },
+                  } as const;
+                  return isVideo(src) ? (
+                    <motion.video
+                      key={src}
+                      ref={safariAutoplay}
+                      src={src}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      {...media}
+                    />
+                  ) : (
+                    <motion.img key={src} src={src} alt={`${slide.company} work`} {...media} />
+                  );
+                })
+              )}
             </motion.div>
           </motion.div>
         </AnimatePresence>

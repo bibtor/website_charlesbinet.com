@@ -54,10 +54,19 @@ export function MobileWorkStrip({
     const tick = () => {
       const third = el.scrollWidth / 3;
       if (third > el.clientWidth) {
-        if (!paused.current) el.scrollLeft += 0.6;
+        if (!paused.current) {
+          pos += 0.6;
+          const next = Math.round(pos);
+          if (next !== el.scrollLeft) el.scrollLeft = next;
+        }
         // seamless loop in both directions
-        if (el.scrollLeft >= third * 2) el.scrollLeft -= third;
-        else if (el.scrollLeft < third * 0.5) el.scrollLeft += third;
+        if (pos >= third * 2) {
+          pos -= third;
+          el.scrollLeft = Math.round(pos);
+        } else if (pos < third * 0.5) {
+          pos += third;
+          el.scrollLeft = Math.round(pos);
+        }
       }
       raf = requestAnimationFrame(tick);
     };

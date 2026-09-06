@@ -98,6 +98,7 @@ const FEED: FeedBlock[] = [
   { type: "assets", srcs: ["/minesquad1.png"] },
   { type: "assets", srcs: ["/minesquad2.png"] },
   { type: "assets", srcs: ["/minesquad3.png"], narrow: true },
+  { type: "assets", srcs: ["/msvid1.mp4", "/msvid2.mp4", "/msvid3.mp4", "/msvid4.mp4"] },
 
   { type: "header", icon: "/datasweeper.png", name: "Datasweeper" },
   { type: "text", body: "A MacOS app to clean your Mac, powered by on-device AI safety scoring." },
@@ -150,6 +151,10 @@ function FeedVideo({
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
+    // Safari: React doesn't render the muted attribute into SSR HTML, and
+    // Safari only autoplays muted video — force the property before playing
+    v.muted = true;
+    v.defaultMuted = true;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) v.play().catch(() => {});
@@ -214,19 +219,23 @@ function FeedBlockView({ block }: { block: FeedBlock }) {
       </div>
     );
   }
-  // assets — pairs render side by side like on the work page
+  // assets — pairs render side by side, four make a 2x2 grid
   return block.srcs.length > 1 ? (
     <div className={`${ASSET_W} grid grid-cols-2 gap-3`}>
-      {block.srcs.map((src) => (
-        <img
-          key={src}
-          src={src}
-          alt="Work asset"
-          loading="lazy"
-          decoding="async"
-          className="w-full h-auto rounded-xl"
-        />
-      ))}
+      {block.srcs.map((src) =>
+        src.endsWith(".mp4") ? (
+          <FeedVideo key={src} src={src} className="w-full h-auto rounded-xl" />
+        ) : (
+          <img
+            key={src}
+            src={src}
+            alt="Work asset"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-auto rounded-xl"
+          />
+        )
+      )}
     </div>
   ) : (
     <img
