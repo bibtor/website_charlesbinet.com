@@ -27,11 +27,11 @@ const FEED: FeedBlock[] = [
     title: "Impact",
     body: "Shipped a new design system, redesigned all screens and flows, navigation. Concepts for conversational UI and agentic workflows.",
   },
-  { type: "assets", srcs: ["/brick0.png"] },
-  { type: "assets", srcs: ["/brick1.png"] },
-  { type: "assets", srcs: ["/brick2.png"] },
-  { type: "assets", srcs: ["/brick3.png", "/brick4.png"] },
-  { type: "assets", srcs: ["/brick5.png"] },
+  { type: "assets", srcs: ["/brick0.webp"] },
+  { type: "assets", srcs: ["/brick1.webp"] },
+  { type: "assets", srcs: ["/brick2.webp"] },
+  { type: "assets", srcs: ["/brick3.webp", "/brick4.webp"] },
+  { type: "assets", srcs: ["/brick5.webp"] },
 
   { type: "header", icon: "/depict.jpg", name: "Depict AI" },
   {
@@ -55,11 +55,11 @@ const FEED: FeedBlock[] = [
     title: "Impact",
     body: "The product took 3 months to integrate, now takes 3 minutes: 99% time to value reduction. Onboarding is now fully self-served: 96% internal cost reduction. From $500k to $2M ARR: 300% increase in revenue. Used by 1000+ online stores, certified built for Shopify, rated 4.5 stars.",
   },
-  { type: "assets", srcs: ["/depict1.png"] },
-  { type: "assets", srcs: ["/depict2.png"] },
-  { type: "assets", srcs: ["/depict3.png", "/depict4.png"] },
-  { type: "assets", srcs: ["/depict5.png"] },
-  { type: "assets", srcs: ["/depict6.png"] },
+  { type: "assets", srcs: ["/depict1.webp"] },
+  { type: "assets", srcs: ["/depict2.webp"] },
+  { type: "assets", srcs: ["/depict3.webp", "/depict4.webp"] },
+  { type: "assets", srcs: ["/depict5.webp"] },
+  { type: "assets", srcs: ["/depict6.webp"] },
   { type: "video", src: "/depictvid2.mp4" },
 
   { type: "header", icon: "/zettle.png", name: "Zettle by PayPal" },
@@ -77,11 +77,11 @@ const FEED: FeedBlock[] = [
     title: "Impact",
     body: "I contributed to the re-design of the onboarding flow in all platforms, web, iOS and Android. Aligned multiple areas within the organization to ship the new flow with their respective features and deadlines. Put in place notifications, activation and experimentation tactics. Put in place design critiques rituals, motion design guidelines and ways of working. Fully re-designed the hardware e-shop. Increased sign-up metrics with market-specific improvements of the KYC and document upload flows.",
   },
-  { type: "assets", srcs: ["/zettle1.png"] },
+  { type: "assets", srcs: ["/zettle1.webp"] },
   { type: "assets", srcs: ["/zettle6.gif", "/zettle7.gif"] },
-  { type: "assets", srcs: ["/zettle2.png"] },
-  { type: "assets", srcs: ["/zettle4.png", "/zettle5.gif"] },
-  { type: "assets", srcs: ["/zettle3.png"] },
+  { type: "assets", srcs: ["/zettle2.webp"] },
+  { type: "assets", srcs: ["/zettle4.webp", "/zettle5.gif"] },
+  { type: "assets", srcs: ["/zettle3.webp"] },
 
   { type: "header", icon: "/minesquad.png", name: "Minesquad" },
   { type: "text", body: "An iOS minesweeper give back game." },
@@ -95,9 +95,9 @@ const FEED: FeedBlock[] = [
     title: "Impact",
     body: "Signed a partnership with The HALO Trust, the biggest non-profit organisation in the world for mine removal. I am donating 50% of my profits to them. So far 150+ downloads :D",
   },
-  { type: "assets", srcs: ["/minesquad1.png"] },
-  { type: "assets", srcs: ["/minesquad2.png"] },
-  { type: "assets", srcs: ["/minesquad3.png"], narrow: true },
+  { type: "assets", srcs: ["/minesquad1.webp"] },
+  { type: "assets", srcs: ["/minesquad2.webp"] },
+  { type: "assets", srcs: ["/minesquad3.webp"], narrow: true },
   { type: "assets", srcs: ["/msvid1.mp4", "/msvid2.mp4", "/msvid3.mp4", "/msvid4.mp4"] },
 
   { type: "header", icon: "/datasweeper.png", name: "Datasweeper" },
@@ -128,9 +128,9 @@ const FEED: FeedBlock[] = [
     body: "Released it to the world for free. 300+ users so far :D",
   },
   { type: "video", src: "/pictokit_demo_small.mp4" },
-  { type: "assets", srcs: ["/picto1.png"] },
-  { type: "assets", srcs: ["/picto2.png"] },
-  { type: "assets", srcs: ["/picto3.png"] },
+  { type: "assets", srcs: ["/picto1.webp"] },
+  { type: "assets", srcs: ["/picto2.webp"] },
+  { type: "assets", srcs: ["/picto3.webp"] },
 ];
 
 const TEXT_W = "w-[min(560px,92%)]";
@@ -140,28 +140,28 @@ const ASSET_W = "w-[min(1200px,94%)]";
 // before anything loads, so the feed's layout NEVER shifts. Stable layout is
 // what keeps the loop-wrap math and seed centering exact.
 const DIMS: Record<string, [number, number]> = {
-  "/depict1.png": [3392, 1744],
-  "/depict2.png": [3392, 1744],
-  "/depict3.png": [1704, 1744],
-  "/depict4.png": [1704, 1744],
-  "/depict5.png": [3392, 1744],
-  "/depict6.png": [3392, 1744],
-  "/zettle1.png": [3392, 1744],
-  "/zettle2.png": [3392, 1744],
-  "/zettle3.png": [3392, 1744],
-  "/zettle4.png": [1600, 1200],
-  "/minesquad1.png": [3392, 1744],
-  "/minesquad2.png": [3392, 1744],
-  "/minesquad3.png": [1600, 1200],
-  "/picto1.png": [3644, 1874],
-  "/picto2.png": [3644, 1874],
-  "/picto3.png": [3644, 1874],
-  "/brick0.png": [3644, 1874],
-  "/brick1.png": [3644, 1874],
-  "/brick2.png": [3644, 1874],
-  "/brick3.png": [2400, 2400],
-  "/brick4.png": [2400, 2400],
-  "/brick5.png": [3644, 1874],
+  "/depict1.webp": [2400, 1234],
+  "/depict2.webp": [2400, 1234],
+  "/depict3.webp": [2345, 2400],
+  "/depict4.webp": [2345, 2400],
+  "/depict5.webp": [2400, 1234],
+  "/depict6.webp": [2400, 1234],
+  "/zettle1.webp": [2400, 1234],
+  "/zettle2.webp": [2400, 1234],
+  "/zettle3.webp": [2400, 1234],
+  "/zettle4.webp": [1600, 1200],
+  "/minesquad1.webp": [2400, 1234],
+  "/minesquad2.webp": [2400, 1234],
+  "/minesquad3.webp": [1600, 1200],
+  "/picto1.webp": [2400, 1234],
+  "/picto2.webp": [2400, 1234],
+  "/picto3.webp": [2400, 1234],
+  "/brick0.webp": [2400, 1234],
+  "/brick1.webp": [2400, 1234],
+  "/brick2.webp": [2400, 1234],
+  "/brick3.webp": [2400, 2400],
+  "/brick4.webp": [2400, 2400],
+  "/brick5.webp": [2400, 1234],
   "/zettle5.gif": [800, 600],
   "/zettle6.gif": [1600, 1200],
   "/zettle7.gif": [1600, 1200],
@@ -277,7 +277,6 @@ function FeedBlockView({ block }: { block: FeedBlock }) {
             alt="Work asset"
             width={DIMS[src]?.[0]}
             height={DIMS[src]?.[1]}
-            loading="lazy"
             decoding="async"
             className="w-full h-auto rounded-xl"
           />
@@ -290,7 +289,6 @@ function FeedBlockView({ block }: { block: FeedBlock }) {
       alt="Work asset"
       width={DIMS[block.srcs[0]]?.[0]}
       height={DIMS[block.srcs[0]]?.[1]}
-      loading="lazy"
       decoding="async"
       className={`${block.narrow ? TEXT_W : ASSET_W} h-auto rounded-xl`}
     />

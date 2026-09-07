@@ -106,7 +106,6 @@ export function MobileWorkStrip({
               key={`${copy}-${src}`}
               src={src}
               alt="Work asset"
-              loading="lazy"
               className="h-full w-auto rounded-xl"
               onClick={() => onAssetClick?.(src)}
             />
