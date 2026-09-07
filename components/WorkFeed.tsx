@@ -136,6 +136,51 @@ const FEED: FeedBlock[] = [
 const TEXT_W = "w-[min(560px,92%)]";
 const ASSET_W = "w-[min(1200px,94%)]";
 
+// Intrinsic dimensions for every asset: the browser reserves the exact space
+// before anything loads, so the feed's layout NEVER shifts. Stable layout is
+// what keeps the loop-wrap math and seed centering exact.
+const DIMS: Record<string, [number, number]> = {
+  "/depict1.png": [3392, 1744],
+  "/depict2.png": [3392, 1744],
+  "/depict3.png": [1704, 1744],
+  "/depict4.png": [1704, 1744],
+  "/depict5.png": [3392, 1744],
+  "/depict6.png": [3392, 1744],
+  "/zettle1.png": [3392, 1744],
+  "/zettle2.png": [3392, 1744],
+  "/zettle3.png": [3392, 1744],
+  "/zettle4.png": [1600, 1200],
+  "/minesquad1.png": [3392, 1744],
+  "/minesquad2.png": [3392, 1744],
+  "/minesquad3.png": [1600, 1200],
+  "/picto1.png": [3644, 1874],
+  "/picto2.png": [3644, 1874],
+  "/picto3.png": [3644, 1874],
+  "/brick0.png": [3644, 1874],
+  "/brick1.png": [3644, 1874],
+  "/brick2.png": [3644, 1874],
+  "/brick3.png": [2400, 2400],
+  "/brick4.png": [2400, 2400],
+  "/brick5.png": [3644, 1874],
+  "/zettle5.gif": [800, 600],
+  "/zettle6.gif": [1600, 1200],
+  "/zettle7.gif": [1600, 1200],
+  "/depictvid1.mp4": [1080, 1080],
+  "/depictvid2.mp4": [1824, 1080],
+  "/dsvid1.mp4": [1976, 1080],
+  "/dsvid2.mp4": [1452, 1080],
+  "/msvid1.mp4": [1000, 1000],
+  "/msvid2.mp4": [1000, 1000],
+  "/msvid3.mp4": [1000, 1000],
+  "/msvid4.mp4": [1000, 1000],
+  "/pictokit_demo_small.mp4": [1696, 1080],
+};
+
+const aspectStyle = (src: string): React.CSSProperties | undefined => {
+  const d = DIMS[src];
+  return d ? { aspectRatio: `${d[0]} / ${d[1]}` } : undefined;
+};
+
 // Video that only plays (and decodes) while near the viewport — with three
 // loop copies of the feed, always-on autoplay melts phones.
 function FeedVideo({
@@ -174,7 +219,7 @@ function FeedVideo({
       playsInline
       preload="metadata"
       className={className}
-      style={style}
+      style={{ ...aspectStyle(src), ...style }}
     />
   );
 }
@@ -230,6 +275,8 @@ function FeedBlockView({ block }: { block: FeedBlock }) {
             key={src}
             src={src}
             alt="Work asset"
+            width={DIMS[src]?.[0]}
+            height={DIMS[src]?.[1]}
             loading="lazy"
             decoding="async"
             className="w-full h-auto rounded-xl"
@@ -241,6 +288,8 @@ function FeedBlockView({ block }: { block: FeedBlock }) {
     <img
       src={block.srcs[0]}
       alt="Work asset"
+      width={DIMS[block.srcs[0]]?.[0]}
+      height={DIMS[block.srcs[0]]?.[1]}
       loading="lazy"
       decoding="async"
       className={`${block.narrow ? TEXT_W : ASSET_W} h-auto rounded-xl`}
@@ -267,10 +316,14 @@ export function WorkFeed({ initialSrc }: { initialSrc?: string }) {
     let ready = false;
 
     // Center the clicked asset (middle copy) so focus mode opens exactly on
-    // the image the visitor pressed; fall back to the top of the middle copy.
+    // the media the visitor pressed; fall back to the top of the middle copy.
+    // Every asset has intrinsic dimensions, so layout is stable immediately —
+    // one positioning pass is exact.
     const position = () => {
       if (initialSrc) {
-        const matches = el.querySelectorAll<HTMLElement>(`img[src="${initialSrc}"]`);
+        const matches = el.querySelectorAll<HTMLElement>(
+          `img[src="${initialSrc}"], video[src="${initialSrc}"]`
+        );
         const target = matches[1] ?? matches[0];
         if (target) {
           const r = target.getBoundingClientRect();
@@ -283,20 +336,9 @@ export function WorkFeed({ initialSrc }: { initialSrc?: string }) {
       if (third > el.clientHeight) el.scrollTop = third;
     };
     position();
-
-    // Surrounding images resize the feed as they load — keep the seed asset
-    // anchored until the visitor scrolls (or 700ms passes)
-    const imgs = [...el.querySelectorAll("img")];
-    const onLoad = () => {
-      if (!ready) position();
-    };
-    imgs.forEach((i) => i.addEventListener("load", onLoad));
-    const markReady = () => {
+    const t = setTimeout(() => {
       ready = true;
-    };
-    const t = setTimeout(markReady, 700);
-    el.addEventListener("wheel", markReady, { passive: true, once: true });
-    el.addEventListener("touchstart", markReady, { passive: true, once: true });
+    }, 150);
 
     const wrap = () => {
       const third = el.scrollHeight / 3;
@@ -320,9 +362,6 @@ export function WorkFeed({ initialSrc }: { initialSrc?: string }) {
     return () => {
       clearTimeout(t);
       clearTimeout(settleTimer.current);
-      imgs.forEach((i) => i.removeEventListener("load", onLoad));
-      el.removeEventListener("wheel", markReady);
-      el.removeEventListener("touchstart", markReady);
       el.removeEventListener("scroll", onScroll);
     };
   }, [initialSrc]);
@@ -357,16 +396,7 @@ export function WorkFeed({ initialSrc }: { initialSrc?: string }) {
         {/* extra top padding on mobile clears the fixed × header */}
         <div className="flex flex-col items-center gap-3 pb-3 pt-24 md:pt-3">
           {[0, 1, 2].map((copy) =>
-            FEED.map((block, i) => (
-              <div
-                key={`${copy}-${i}`}
-                className="w-full flex justify-center"
-                // skip layout/paint work for far-offscreen blocks
-                style={{ contentVisibility: "auto", containIntrinsicSize: "auto 500px" }}
-              >
-                <FeedBlockView block={block} />
-              </div>
-            ))
+            FEED.map((block, i) => <FeedBlockView key={`${copy}-${i}`} block={block} />)
           )}
         </div>
       </div>
