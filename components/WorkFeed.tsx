@@ -142,8 +142,8 @@ const ASSET_W = "w-[min(1200px,94%)]";
 const DIMS: Record<string, [number, number]> = {
   "/depict1.webp": [2400, 1234],
   "/depict2.webp": [2400, 1234],
-  "/depict3.webp": [2345, 2400],
-  "/depict4.webp": [2345, 2400],
+  "/depict3.webp": [1704, 1744],
+  "/depict4.webp": [1704, 1744],
   "/depict5.webp": [2400, 1234],
   "/depict6.webp": [2400, 1234],
   "/zettle1.webp": [2400, 1234],
