@@ -23,7 +23,7 @@ const fadeUp = (delay: number) => ({
 
 const contactButtons = [
   { href: "https://www.linkedin.com/in/charles-binet/", label: "LinkedIn", Icon: Linkedin },
-  { href: "https://cal.com/charlesbinet/15min?overlayCalendar=true", label: "Book a call", Icon: Calendar },
+  { href: "https://cal.com/charlesbinet/30min?overlayCalendar=true", label: "Book a call", Icon: Calendar },
   { href: "https://dribbble.com/charles_b", label: "Dribbble", Icon: Dribbble },
 ];
 
