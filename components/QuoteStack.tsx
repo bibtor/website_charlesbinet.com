@@ -24,7 +24,7 @@ const QUOTES = [
     name: "Linus Bein Fahlander",
     role: "CTO, Brickanta",
     avatar: "/linus.jpeg",
-    text: "I've worked with Charles in both product lead designer and supporting designer roles.\n\nHe has great taste for product design and animations. I really appreciate his ability to challenge ideas and directions in a constructive and productive manner. One of the few designers I've worked with that naturally invited to discussion, which always led to better outcomes. I've seen that he easily own things end to end and is very self going when needed. A true builder with a strong sense of taste in other words!",
+    text: "I've worked with Charles in both product lead designer and supporting designer roles.\n\nHe has great taste for product design and animations. I really appreciate his ability to challenge ideas and directions in a constructive and productive manner. One of the few designers I've worked with that naturally invited to discussion, which always led to better outcomes.\n\nI've seen that he easily own things end to end and is very self going when needed. A true builder with a strong sense of taste in other words!",
   },
 ];
 
