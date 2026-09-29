@@ -20,6 +20,12 @@ const QUOTES = [
     avatar: "/keren.jpeg",
     text: "I've had the pleasure to work with Charles since 2015 and can sincerely say that he is one of the best and most versatile designers I've met.\n\nAs he masters both design leadership and craftsmanship, Charles is that person who can deliver both high-level visions and pixel-perfect designs.\n\nHis work is well thought out and I'm often impressed by his way to convey the message, process or user need behind it in a visual and engaging way.\n\nTo top all that, he is the nicest, most humble guy whom many find inspiring.\n\nThe team that gets Charles onboard is a truly lucky one.",
   },
+  {
+    name: "Linus Bein Fahlander",
+    role: "CTO, Brickanta",
+    avatar: "/linus.jpeg",
+    text: "I've worked with Charles in both product lead designer and supporting designer roles.\n\nHe has great taste for product design and animations. I really appreciate his ability to challenge ideas and directions in a constructive and productive manner. One of the few designers I've worked with that naturally invited to discussion, which always led to better outcomes. I've seen that he easily own things end to end and is very self going when needed. A true builder with a strong sense of taste in other words!",
+  },
 ];
 
 export function QuoteStack() {
