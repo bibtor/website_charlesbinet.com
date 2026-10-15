@@ -162,6 +162,20 @@ export default function Home() {
                 <span className="text-[15px] font-medium text-white">Charles Binet</span>
                 <span className="text-[13px] text-white/50">Product & Design leader</span>
                 <span className="text-[13px] text-white/50">SaaS, AI and indie products</span>
+                <div className="flex gap-1.5 mt-1">
+                  <span
+                    className="text-[13px] px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: "rgba(248,113,113,0.1)", color: "rgba(248,113,113,0.85)" }}
+                  >
+                    Fully booked for 2026
+                  </span>
+                  <span
+                    className="text-[13px] px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: "rgba(134,239,172,0.1)", color: "rgba(134,239,172,0.85)" }}
+                  >
+                    Open from Jan 2027
+                  </span>
+                </div>
               </div>
               <Image
                 src="/avatar.jpeg"
