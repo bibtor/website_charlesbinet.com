@@ -29,6 +29,7 @@ Minimalist personal portfolio for a product designer. The homepage was fully red
 - `MobileWorkStrip.tsx` — mobile horizontal marquee
 - `RevealText.tsx` — kugiri masked line reveal (use `opacity:0` pre-split, never `visibility:hidden` — kugiri skips hidden content)
 - `ClientTicker.tsx`, `AppsGrid.tsx`, `QuoteStack.tsx`
+- `AvailabilityTags.tsx` — the two availability pills ("Booked until end 2026" / "Open in Jan 2027"); rendered under the desktop pile (absolute, bottom-5 centred) and under the mobile strip. Edit the dates there when availability changes
 - Easter egg: nuggets unlock after ~3 full manual passes through the assets (WorkPile manual advances / strip hand-scroll distance)
 
 ## Gotchas

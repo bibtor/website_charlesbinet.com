@@ -11,6 +11,7 @@ import { ClientTicker } from "@/components/ClientTicker";
 import { QuoteStack } from "@/components/QuoteStack";
 import { AppsGrid } from "@/components/AppsGrid";
 import { RevealText } from "@/components/RevealText";
+import { AvailabilityTags } from "@/components/AvailabilityTags";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -162,20 +163,6 @@ export default function Home() {
                 <span className="text-[15px] font-medium text-white">Charles Binet</span>
                 <span className="text-[13px] text-white/50">Product & Design leader</span>
                 <span className="text-[13px] text-white/50">SaaS, AI and indie products</span>
-                <div className="flex gap-1.5 mt-1">
-                  <span
-                    className="text-[13px] px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: "rgba(248,113,113,0.1)", color: "rgba(248,113,113,0.85)" }}
-                  >
-                    Fully booked for 2026
-                  </span>
-                  <span
-                    className="text-[13px] px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: "rgba(134,239,172,0.1)", color: "rgba(134,239,172,0.85)" }}
-                  >
-                    Open from Jan 2027
-                  </span>
-                </div>
               </div>
               <Image
                 src="/avatar.jpeg"
@@ -252,14 +239,18 @@ export default function Home() {
               Unmounted in focus mode so its rAF loop doesn't drain the phone. */}
           <motion.div {...fadeUp(0.1)} className="md:hidden">
             {!focusMode && (
-              <MobileWorkStrip
-                assets={ALL_ASSETS}
-                onExplored={unlockNuggets}
-                onAssetClick={(src) => {
-                  setSeedSrc(src);
-                  setFocusMode(true);
-                }}
-              />
+              <>
+                <MobileWorkStrip
+                  assets={ALL_ASSETS}
+                  onExplored={unlockNuggets}
+                  onAssetClick={(src) => {
+                    setSeedSrc(src);
+                    setFocusMode(true);
+                  }}
+                />
+                {/* Availability — tucked right under the strip */}
+                <AvailabilityTags className="fade-unit mt-3 justify-center" />
+              </>
             )}
           </motion.div>
 
@@ -448,6 +439,13 @@ export default function Home() {
                     setFocusMode(true);
                   }}
                 />
+                {/* Availability — centred under the stage, on the arrows' baseline */}
+                <motion.div
+                  className="absolute bottom-5 left-0 right-0 z-10 flex justify-center pointer-events-none"
+                  {...fadeUp(0.5)}
+                >
+                  <AvailabilityTags className="pointer-events-auto" />
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
