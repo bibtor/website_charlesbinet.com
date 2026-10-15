@@ -11,6 +11,7 @@ type Client = {
 // Brand logos from public/logos; Brickanta and Daresay use their local product icons
 const ROW_ONE: Client[] = [
   { name: "Brickanta", logo: "/brickanta.png", whiteBg: true },
+  { name: "Matters", logo: "/logos/matters.png", whiteBg: true },
   { name: "Depict", logo: "/logos/depict.png" },
   { name: "Validio", logo: "/logos/validio.png" },
   { name: "iZettle", logo: "/logos/zettle.png" },
